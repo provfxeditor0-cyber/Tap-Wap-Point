@@ -59,9 +59,9 @@
 
         /* --- UPDATED INFO BUTTON (FAINTER VISIBILITY) --- */
         .info-btn {
-            background: rgba(255, 255, 255, 0.05); /* Even more transparent */
-            border: 1px solid rgba(255, 255, 255, 0.1); /* Very faint border */
-            color: rgba(255, 255, 255, 0.3); /* Very faint icon color */
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.3);
             width: 30px;
             height: 30px;
             border-radius: 50%;
@@ -72,9 +72,9 @@
             font-weight: bold;
             font-family: serif;
             transition: all 0.3s ease;
-            display: none; /* Hidden by default on Home */
+            display: none;
             backdrop-filter: blur(2px);
-            opacity: 0.4; /* Reduced visibility */
+            opacity: 0.4;
         }
 
         .info-btn:hover {
@@ -84,12 +84,38 @@
             opacity: 0.7;
         }
 
+        /* SAVED STATUS INDICATOR */
+        .save-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #4CAF50;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         /* MAIN CONTENT AREA */
         .app-content {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            padding-bottom: 100px; /* Extra space for bottom nav */
+            padding-bottom: 100px;
             position: relative;
         }
 
@@ -431,6 +457,11 @@
 </head>
 <body>
 
+    <div class="save-indicator" id="saveIndicator">
+        <i class="fas fa-check-circle"></i>
+        <span>Points Saved!</span>
+    </div>
+
     <header>
         <h1 id="page-title">Home</h1>
         <div class="info-btn" id="infoBtn">i</div>
@@ -692,11 +723,45 @@
         let targetVillage = "";
         let targetCode = "";
 
+        // --- LOCALSTORAGE FUNCTIONS ---
+        function savePointsToStorage() {
+            localStorage.setItem('userPoints', currentPoints.toString());
+            showSaveIndicator();
+        }
+
+        function loadPointsFromStorage() {
+            const savedPoints = localStorage.getItem('userPoints');
+            if (savedPoints !== null) {
+                currentPoints = parseInt(savedPoints);
+            } else {
+                currentPoints = 0;
+                savePointsToStorage(); // Initialize with 0
+            }
+        }
+
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        function updatePoints(amount) {
+            currentPoints += amount;
+            savePointsToStorage();
+            updateBalanceUI();
+        }
+
         // --- INITIALIZATION ---
         window.onload = function() {
+            loadPointsFromStorage();
             updateBalanceUI();
             generateGameData();
             initializeAdsterraAds();
+            
+            // Auto-save every 30 seconds as backup
+            setInterval(savePointsToStorage, 30000);
         };
 
         function updateBalanceUI() {
@@ -742,9 +807,7 @@
 
         // --- ADSTERRA ADS INITIALIZATION ---
         function initializeAdsterraAds() {
-            // This function can be used to initialize or refresh ads on page switch
             setTimeout(() => {
-                // Simulate ad loading
                 console.log("Adsterra ads initialized");
             }, 1000);
         }
@@ -760,15 +823,14 @@
             const countdownTimer = document.getElementById('countdown-timer');
             const adContainer = document.querySelector('.ad-container > div:first-child');
             
-            // Disable button
             watchBtn.classList.add('disabled');
             watchBtn.innerHTML = '<i class="fas fa-hourglass-half"></i> WATCHING AD...';
             
-            // Show countdown timer
             countdownTimer.style.display = 'block';
-            adContainer.style.opacity = '0.5';
+            if (adContainer) {
+                adContainer.style.opacity = '0.5';
+            }
             
-            // Start countdown
             adTimer = setInterval(() => {
                 secondsLeft--;
                 countdownTimer.textContent = secondsLeft;
@@ -787,19 +849,17 @@
             const countdownTimer = document.getElementById('countdown-timer');
             const adContainer = document.querySelector('.ad-container > div:first-child');
             
-            // Reward user
-            currentPoints += 30;
-            updateBalanceUI();
+            // Reward user and save to storage
+            updatePoints(30);
             
-            // Reset UI
             countdownTimer.style.display = 'none';
-            adContainer.style.opacity = '1';
+            if (adContainer) {
+                adContainer.style.opacity = '1';
+            }
             
-            // Show reward modal
             document.getElementById('new-balance').textContent = currentPoints;
             document.getElementById('adRewardModal').style.display = 'flex';
             
-            // Reset button
             setTimeout(() => {
                 watchBtn.classList.remove('disabled');
                 watchBtn.innerHTML = '<i class="fas fa-play-circle"></i> WATCH AD & GET 30 COINS';
@@ -831,17 +891,15 @@
 
         // --- GAME LOGIC ---
         function generateGameData() {
-            // Generate Random Values
             const randFirst = firstNames[Math.floor(Math.random() * firstNames.length)];
             const randLast = lastNames[Math.floor(Math.random() * lastNames.length)];
             targetName = `${randFirst} ${randLast}`;
             targetVillage = fakeVillages[Math.floor(Math.random() * fakeVillages.length)];
             
-            const randLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // A-Z
+            const randLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
             const randNum = Math.floor(1000 + Math.random() * 9000);
             targetCode = `${randLetter}${randNum}`;
 
-            // Update UI
             const box = document.getElementById('target-data-box');
             box.classList.add('data-changing');
             
@@ -852,7 +910,6 @@
                 box.classList.remove('data-changing');
             }, 300);
 
-            // Clear inputs
             document.getElementById('game-name').value = '';
             document.getElementById('game-village').value = '';
             document.getElementById('game-code').value = '';
@@ -868,7 +925,6 @@
             const isCodeMatch = inCode === targetCode;
             const isWin = isNameMatch && isVillageMatch && isCodeMatch;
 
-            // Fill Modal Details
             document.getElementById('res-name-match').innerHTML = isNameMatch ? '<i class="fas fa-check-circle match-yes"></i>' : '<i class="fas fa-times-circle match-no"></i>';
             document.getElementById('res-village-match').innerHTML = isVillageMatch ? '<i class="fas fa-check-circle match-yes"></i>' : '<i class="fas fa-times-circle match-no"></i>';
             document.getElementById('res-code-match').innerHTML = isCodeMatch ? '<i class="fas fa-check-circle match-yes"></i>' : '<i class="fas fa-times-circle match-no"></i>';
@@ -893,15 +949,14 @@
         }
 
         function claimReward() {
-            currentPoints += 25;
-            updateBalanceUI();
+            updatePoints(25);
             document.getElementById('gameResultModal').style.display = 'none';
-            generateGameData(); // Start new round
+            generateGameData();
         }
 
         function resetGame() {
             document.getElementById('gameResultModal').style.display = 'none';
-            generateGameData(); // Start new round
+            generateGameData();
         }
 
         // --- BUY PAGE LOGIC ---
@@ -910,7 +965,6 @@
             const opt = this.options[this.selectedIndex];
             const cost = opt.getAttribute('data-cost');
             const qty = opt.getAttribute('data-qty');
-            const text = opt.text.replace(/[\d\W_]+/g, ' ').trim(); 
             document.getElementById('rate-display').innerText = `${cost} points = ${qty} actions`;
         });
 
@@ -922,8 +976,7 @@
             if(!link) return alert("Please enter link");
             
             if(currentPoints >= cost) {
-                currentPoints -= cost;
-                updateBalanceUI();
+                updatePoints(-cost);
                 alert("Campaign Created Successfully!");
                 document.getElementById('campaign-link').value = "";
             } else {
@@ -960,11 +1013,10 @@
             if(!email) return alert("Enter payment email");
 
             if(currentPoints >= coins) {
-                currentPoints -= coins;
-                updateBalanceUI();
+                updatePoints(-coins);
                 alert(`Redemption Request Sent for ₹${(coins/1000)*100}`);
                 document.getElementById('redeem-coins').value = "";
-                calculateInr(); // Reset display
+                calculateInr();
             } else {
                 alert("Insufficient Balance");
             }
@@ -979,6 +1031,11 @@
         document.getElementById('target-data-box').addEventListener('copy', (e) => {
             e.preventDefault();
             alert("Copying not allowed! Please type manually.");
+        });
+
+        // Save points before page unload
+        window.addEventListener('beforeunload', function() {
+            savePointsToStorage();
         });
     </script>
 </body>
