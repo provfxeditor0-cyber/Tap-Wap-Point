@@ -6,9 +6,8 @@
     <title>Social Rewards & Games</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Adsterra Scripts -->
-    <script src="https://pl28429274.effectivegatecpm.com/a0/34/21/a0342166e2530539295a4706d13f5639.js"></script>
-    <script async="async" data-cfasync="false" src="https://pl28484497.effectivegatecpm.com/e1ed977cdea719feb9c702a6af62d3ad/invoke.js"></script>
+    <!-- AdMaven Code -->
+    <meta name='admaven-placement' content='Bqjw7qjY7'>
     
     <style>
         /* --- GLOBAL APP STYLES --- */
@@ -453,6 +452,18 @@
             font-size: 0.9rem;
             color: #666;
         }
+        
+        /* AdMaven Ad Container */
+        .admaven-ad {
+            width: 100%;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f5f5;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
@@ -476,10 +487,13 @@
                 <p style="font-size: 0.9rem; opacity: 0.9; font-weight: 500;"><i class="fas fa-arrow-down"></i> Play below to earn points!</p>
             </div>
 
-            <!-- Adsterra Ad Banner -->
+            <!-- AdMaven Ad Banner -->
             <div class="ad-banner">
                 <p><i class="fas fa-ad"></i> Advertisement</p>
-                <div id="adsterra-banner-home"></div>
+                <div class="admaven-ad" id="admaven-banner-home">
+                    <!-- AdMaven ads will load here -->
+                    <p>Advertisement loading...</p>
+                </div>
             </div>
 
             <div class="game-section">
@@ -526,10 +540,13 @@
                 <h2 class="balance-amount">Exchange Points</h2>
             </div>
 
-            <!-- Adsterra Ad Banner -->
+            <!-- AdMaven Ad Banner -->
             <div class="ad-banner">
                 <p><i class="fas fa-ad"></i> Advertisement</p>
-                <div id="adsterra-banner-buy"></div>
+                <div class="admaven-ad" id="admaven-banner-buy">
+                    <!-- AdMaven ads will load here -->
+                    <p>Advertisement loading...</p>
+                </div>
             </div>
 
             <div class="form-group">
@@ -575,7 +592,10 @@
                 
                 <!-- Ad Container -->
                 <div class="ad-container">
-                    <div id="container-e1ed977cdea719feb9c702a6af62d3ad"></div>
+                    <div class="admaven-ad" id="admaven-video-ad">
+                        <!-- AdMaven video ad will load here -->
+                        <p>Video advertisement will play here</p>
+                    </div>
                     <div class="countdown-timer" id="countdown-timer">20</div>
                 </div>
                 
@@ -587,7 +607,10 @@
             <!-- Additional Ad Banner -->
             <div class="ad-banner" style="margin-top: 20px;">
                 <p><i class="fas fa-ad"></i> More Ads Available</p>
-                <div id="adsterra-banner-watch"></div>
+                <div class="admaven-ad" id="admaven-banner-watch">
+                    <!-- AdMaven ads will load here -->
+                    <p>Advertisement loading...</p>
+                </div>
             </div>
 
             <div class="game-section" style="margin-top: 20px;">
@@ -607,10 +630,13 @@
                 <h2 id="wallet-balance" class="balance-amount">0</h2>
             </div>
 
-            <!-- Adsterra Ad Banner -->
+            <!-- AdMaven Ad Banner -->
             <div class="ad-banner">
                 <p><i class="fas fa-ad"></i> Advertisement</p>
-                <div id="adsterra-banner-wallet"></div>
+                <div class="admaven-ad" id="admaven-banner-wallet">
+                    <!-- AdMaven ads will load here -->
+                    <p>Advertisement loading...</p>
+                </div>
             </div>
 
             <div class="form-group">
@@ -758,7 +784,9 @@
             loadPointsFromStorage();
             updateBalanceUI();
             generateGameData();
-            initializeAdsterraAds();
+            
+            // Initialize AdMaven ads
+            initializeAdMavenAds();
             
             // Auto-save every 30 seconds as backup
             setInterval(savePointsToStorage, 30000);
@@ -805,11 +833,11 @@
             }
         }
 
-        // --- ADSTERRA ADS INITIALIZATION ---
-        function initializeAdsterraAds() {
-            setTimeout(() => {
-                console.log("Adsterra ads initialized");
-            }, 1000);
+        // --- ADMAVEN ADS INITIALIZATION ---
+        function initializeAdMavenAds() {
+            // AdMaven ads are initialized via meta tag
+            // Additional AdMaven script can be added here if needed
+            console.log("AdMaven ads initialized");
         }
 
         // --- WATCH AD FUNCTIONALITY ---
@@ -821,15 +849,18 @@
             
             const watchBtn = document.getElementById('watch-ad-btn');
             const countdownTimer = document.getElementById('countdown-timer');
-            const adContainer = document.querySelector('.ad-container > div:first-child');
+            const adContainer = document.getElementById('admaven-video-ad');
             
             watchBtn.classList.add('disabled');
             watchBtn.innerHTML = '<i class="fas fa-hourglass-half"></i> WATCHING AD...';
             
-            countdownTimer.style.display = 'block';
+            // Hide ad content and show countdown
             if (adContainer) {
                 adContainer.style.opacity = '0.5';
+                adContainer.style.pointerEvents = 'none';
             }
+            
+            countdownTimer.style.display = 'block';
             
             adTimer = setInterval(() => {
                 secondsLeft--;
@@ -847,7 +878,7 @@
             
             const watchBtn = document.getElementById('watch-ad-btn');
             const countdownTimer = document.getElementById('countdown-timer');
-            const adContainer = document.querySelector('.ad-container > div:first-child');
+            const adContainer = document.getElementById('admaven-video-ad');
             
             // Reward user and save to storage
             updatePoints(30);
@@ -855,6 +886,7 @@
             countdownTimer.style.display = 'none';
             if (adContainer) {
                 adContainer.style.opacity = '1';
+                adContainer.style.pointerEvents = 'auto';
             }
             
             document.getElementById('new-balance').textContent = currentPoints;
@@ -873,7 +905,7 @@
             
             const watchBtn = document.getElementById('watch-ad-btn');
             const countdownTimer = document.getElementById('countdown-timer');
-            const adContainer = document.querySelector('.ad-container > div:first-child');
+            const adContainer = document.getElementById('admaven-video-ad');
             
             watchBtn.classList.remove('disabled');
             watchBtn.innerHTML = '<i class="fas fa-play-circle"></i> WATCH AD & GET 30 COINS';
@@ -882,6 +914,7 @@
             
             if (adContainer) {
                 adContainer.style.opacity = '1';
+                adContainer.style.pointerEvents = 'auto';
             }
         }
         
