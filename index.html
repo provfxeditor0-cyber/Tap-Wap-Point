@@ -2,3077 +2,666 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CodeVille Captcha Arena</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Rewards & Games</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-    
-    <!-- Ad Scripts -->
-    <script src="https://pl28429274.effectivegatecpm.com/a0/34/21/a0342166e2530539295a4706d13f5639.js"></script>
-    <script async="async" data-cfasync="false" src="https://pl28484497.effectivegatecpm.com/e1ed977cdea719feb9c702a6af62d3ad/invoke.js"></script>
-    
     <style>
-        /* ==================== CSS RESET & VARIABLES ==================== */
+        /* --- GLOBAL APP STYLES --- */
         :root {
-            --primary: #7000ff;
-            --primary-dark: #4a00b3;
-            --secondary: #00d2ff;
-            --bg-dark: #050507;
-            --surface: rgba(255, 255, 255, 0.05);
-            --surface-highlight: rgba(255, 255, 255, 0.1);
-            --text: #ffffff;
-            --text-muted: #8f9ab3;
-            --danger: #ff4757;
-            --success: #2ecc71;
-            --warning: #f39c12;
-            --grad-main: linear-gradient(135deg, var(--primary), var(--secondary));
-            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --primary-color: #6200ea;
+            --primary-dark: #3700b3;
+            --secondary-color: #03dac6;
+            --bg-color: #f8f9fa;
+            --white: #ffffff;
+            --text-color: #333;
+            --gray: #888;
+            --red: #ff3b30;
         }
 
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Poppins', sans-serif;
-            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: radial-gradient(circle at top right, #1a0a2e, #000000);
-            color: var(--text);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
-        /* ==================== UTILITY CLASSES ==================== */
-        .hidden { display: none !important; }
-        .full-screen {
-            width: 100%; 
-            height: 100%; 
-            position: absolute; 
-            top: 0; 
-            left: 0;
-            background: var(--bg-dark); 
-            z-index: 10; 
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .container { padding: 25px; }
-        .center-flex { 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            flex-direction: column; 
-        }
-        
-        /* ==================== BUTTONS ==================== */
-        button {
-            background: var(--grad-main); 
-            border: none; 
-            color: white;
-            padding: 16px 20px; 
-            border-radius: 12px; 
-            font-size: 18px; 
-            font-weight: bold;
-            cursor: pointer; 
-            width: 100%; 
-            margin-top: 20px;
-            box-shadow: 0 10px 20px -10px rgba(112, 0, 255, 0.5);
-            transition: transform 0.2s, box-shadow 0.2s;
-            min-height: 54px;
-            user-select: none;
-        }
-        
-        button:active { 
-            transform: scale(0.97); 
-            box-shadow: 0 5px 10px -5px rgba(112, 0, 255, 0.5); 
-        }
-        
-        button.danger { 
-            background: var(--danger); 
-            box-shadow: 0 10px 20px -10px rgba(255, 71, 87, 0.5); 
-        }
-        
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        /* ==================== INPUT FIELDS ==================== */
-        .input-group {
-            position: relative;
-            margin-bottom: 20px;
-            background: var(--surface);
-            border-radius: 12px;
-            border: var(--glass-border);
-            display: flex;
-            align-items: center;
-            padding: 5px 15px;
-            transition: all 0.3s;
-        }
-        
-        .input-group:focus-within {
-            border-color: var(--secondary);
-            background: var(--surface-highlight);
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
-        }
-        
-        .input-icon { 
-            width: 24px; 
-            height: 24px; 
-            color: var(--text-muted); 
-            margin-right: 10px; 
-            transition: color 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        
-        .input-group:focus-within .input-icon { 
-            color: var(--secondary); 
-        }
-        
-        input {
-            width: 100%; 
-            padding: 14px 0; 
-            background: transparent; 
-            border: none;
-            color: white; 
-            outline: none; 
-            font-size: 16px; 
-            font-weight: 500;
-            -webkit-appearance: none;
-        }
-        
-        input::placeholder { 
-            color: var(--text-muted); 
-        }
-        
-        /* ==================== REGISTER SCREEN ==================== */
-        #register-screen {
-            z-index: 100;
-            background: radial-gradient(circle at center, #2a1a3e 0%, #000000 100%);
-        }
-        
-        .auth-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 40px 30px;
-            border-radius: 24px;
-            border: var(--glass-border);
-            width: 90%; 
-            max-width: 420px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-        
-        /* ==================== HEADINGS ==================== */
-        h2 {
-            font-size: 28px; 
-            font-weight: 800; 
-            margin-bottom: 25px;
-            background: var(--grad-main); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent;
-            text-align: center; 
-            letter-spacing: 1px;
-        }
-        
-        /* ==================== MAIN APP LAYOUT ==================== */
-        #main-app { 
-            padding-bottom: 90px; 
-            height: 100%; 
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        /* Top Right Coin Display */
-        .top-coin-display {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: var(--glass-border);
-            border-radius: 50px;
-            padding: 10px 18px 10px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 40;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .top-coin-icon {
-            font-size: 22px;
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
-        }
-        
-        .top-coin-amount {
-            font-weight: bold;
-            font-size: 18px;
-            color: #FFD700;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-        }
-        
-        /* ==================== TOAST NOTIFICATION ==================== */
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(243, 156, 18, 0.9);
-            backdrop-filter: blur(20px);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 50px;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 5px 20px rgba(243, 156, 18, 0.3);
-            animation: slideDown 0.3s ease;
-            max-width: 90%;
-            text-align: center;
-        }
-        
-        @keyframes slideDown {
-            from { top: -100px; }
-            to { top: 20px; }
-        }
-        
-        /* ==================== NAVBAR ==================== */
-        .nav-bar {
-            position: fixed; 
-            bottom: 20px; 
-            left: 50%; 
-            transform: translateX(-50%);
-            width: 92%; 
-            max-width: 450px; 
-            height: 70px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            display: flex; 
-            justify-content: space-around; 
-            align-items: center;
-            border-radius: 20px; 
-            border: var(--glass-border);
-            z-index: 50; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-        
-        .nav-item { 
-            font-size: 11px; 
-            color: var(--text-muted); 
-            cursor: pointer; 
-            text-align: center; 
-            width: 25%; 
-            transition: all 0.3s; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 0;
-            min-height: 60px;
-        }
-        
-        .nav-icon { 
-            font-size: 20px; 
-            margin-bottom: 5px; 
-            display: block;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border: var(--glass-border);
-        }
-        
-        .nav-item.active { 
-            color: var(--secondary); 
-            transform: translateY(-5px); 
-        }
-        
-        .nav-item.active .nav-icon {
-            background: linear-gradient(135deg, rgba(112, 0, 255, 0.2), rgba(0, 210, 255, 0.2));
-            border-color: rgba(0, 210, 255, 0.3);
-        }
-        
-        /* ==================== HOME PAGE - GAMES MENU ==================== */
-        .home-header { 
-            margin-top: 40px; 
-            text-align: center; 
-            padding: 20px;
-        }
-        
-        .games-menu {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .game-menu-item {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            padding: 25px;
-            border-radius: 24px;
-            border: var(--glass-border);
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .game-menu-item:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(0, 210, 255, 0.3);
-        }
-        
-        .game-menu-item.locked {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        
-        .game-menu-item.locked:hover {
-            transform: none;
-            background: rgba(255, 255, 255, 0.03);
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-        
-        .lock-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: var(--warning);
-            color: white;
-            font-size: 10px;
-            padding: 4px 8px;
-            border-radius: 10px;
-            font-weight: bold;
-        }
-        
-        .game-menu-icon {
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 15px;
-            margin-right: 20px;
-            font-size: 28px;
-            background: linear-gradient(135deg, rgba(112, 0, 255, 0.2), rgba(0, 210, 255, 0.2));
-            border: 2px solid rgba(0, 210, 255, 0.3);
-        }
-        
-        .game-menu-details {
-            flex: 1;
-        }
-        
-        .game-menu-details h3 {
-            font-size: 20px;
-            margin-bottom: 5px;
-        }
-        
-        .game-menu-details p {
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-        
-        .game-menu-arrow {
-            color: var(--secondary);
-            font-size: 24px;
-            transition: transform 0.3s;
-        }
-        
-        .game-menu-item:hover .game-menu-arrow {
-            transform: translateX(5px);
-        }
-        
-        /* ==================== POPUPS ==================== */
-        .popup-overlay {
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%;
-            background: rgba(0,0,0,0.8); 
-            z-index: 200;
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            backdrop-filter: blur(5px); 
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .popup-card {
-            background: rgba(30, 30, 40, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 35px; 
-            border-radius: 24px;
-            width: 90%; 
-            max-width: 380px; 
-            text-align: center;
-            border: 1px solid var(--primary);
-            box-shadow: 0 0 30px rgba(112, 0, 255, 0.3);
-            position: relative;
-            animation: slideUp 0.4s ease;
-            margin: 20px;
-        }
-        
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 28px;
-            color: var(--text-muted);
-            cursor: pointer;
-            line-height: 1;
-            transition: color 0.3s;
-            z-index: 5;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .close-btn:hover { 
-            color: var(--danger); 
-        }
-        
-        .coin-anim { 
-            font-size: 60px; 
-            margin: 20px 0; 
-            animation: bounce 1.5s infinite ease-in-out; 
-            display: inline-block; 
-            filter: drop-shadow(0 0 10px gold); 
-        }
-        
-        @keyframes bounce { 
-            0%, 100% { transform: translateY(0) scale(1); } 
-            50% { transform: translateY(-15px) scale(1.1); } 
-        }
-        
-        @keyframes fadeIn { 
-            from { opacity: 0; } 
-            to { opacity: 1; } 
-        }
-        
-        @keyframes slideUp { 
-            from { transform: translateY(50px); opacity: 0; } 
-            to { transform: translateY(0); opacity: 1; } 
-        }
-        
-        /* ==================== TIC TAC TOE GAME ==================== */
-        .tictactoe-game-container {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: var(--glass-border);
-            margin: 20px;
-            overflow: hidden;
-        }
-        
-        .tictactoe-header {
-            background: linear-gradient(to right, #0f3460, #1a1a2e);
-            color: white;
-            padding: 20px;
+        /* HEADER */
+        header {
+            background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+            color: var(--white);
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 10;
         }
-        
-        .tictactoe-header h2 {
-            font-size: 24px;
-            margin: 0;
-            background: none;
-            -webkit-text-fill-color: white;
-        }
-        
-        .tictactoe-coins-display {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 50px;
-            padding: 8px 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            font-size: 16px;
-        }
-        
-        .back-header {
-            display: flex;
-            align-items: center;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.02);
-            border-bottom: var(--glass-border);
-        }
-        
-        .back-btn-game {
-            font-size: 28px;
-            margin-right: 20px;
-            cursor: pointer;
-            color: var(--secondary);
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: var(--glass-border);
-        }
-        
-        .game-title {
-            font-size: 24px;
-            background: var(--grad-main);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: bold;
-        }
-        
-        .tictactoe-content {
-            padding: 25px;
-        }
-        
-        .difficulty-selector {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: var(--glass-border);
-        }
-        
-        .difficulty-selector label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .difficulty-selector select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--surface);
-            border-radius: 10px;
-            font-size: 16px;
-            background-color: rgba(255, 255, 255, 0.05);
-            color: white;
-            outline: none;
-        }
-        
-        .game-board {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            gap: 10px;
-            aspect-ratio: 1;
-            max-width: 300px;
-            margin: 0 auto 25px;
-        }
-        
-        .cell {
-            background: var(--surface);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: var(--glass-border);
-            aspect-ratio: 1;
-        }
-        
-        .cell:hover {
-            background: var(--surface-highlight);
-            transform: scale(1.05);
-        }
-        
-        .cell.x {
-            color: #4a90e2;
-            text-shadow: 0 0 15px rgba(74, 144, 226, 0.5);
-        }
-        
-        .cell.o {
-            color: #e74c3c;
-            text-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
-        }
-        
-        .game-status {
-            text-align: center;
-            margin: 20px 0;
-            font-size: 18px;
-            color: var(--text-muted);
-            min-height: 30px;
-        }
-        
-        .game-controls {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .game-controls button {
-            margin: 0;
-            flex: 1;
-            padding: 14px;
-            font-size: 16px;
-            min-height: 50px;
-        }
-        
-        .restart-btn {
-            background: linear-gradient(135deg, #8e44ad, #9b59b6);
-        }
-        
-        /* Win/Lose Panels */
-        .win-panel, .lose-panel {
-            position: fixed;
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.85);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-        
-        .win-panel.active, .lose-panel.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-        
-        .win-card, .lose-card {
-            background: #2d2d2d;
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            border: 2px solid var(--secondary);
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);
-            transform: scale(0.8);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: 90%;
-            max-width: 350px;
-        }
-        
-        .win-panel.active .win-card, 
-        .lose-panel.active .lose-card { 
-            transform: scale(1); 
-        }
-        
-        .win-title {
-            font-size: 2rem;
-            color: var(--success);
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
-        .win-reward {
-            font-size: 3rem;
-            color: #FFD700;
-            font-weight: bold;
-            margin: 10px 0;
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        
-        .collect-btn {
-            background: linear-gradient(to right, #e94560, #ff6b8b);
-            color: white;
-            border: none;
-            padding: 16px 40px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(245, 166, 35, 0.4);
-            width: auto;
-            margin: 0;
-        }
-        
-        .lose-title {
-            font-size: 2rem;
-            color: #e74c3c;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
-        .lose-btn {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 16px 40px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
-        }
-        
-        /* ==================== CAPTCHA GAME ==================== */
-        .captcha-game-container {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: var(--glass-border);
-            margin: 20px;
-            overflow: hidden;
-        }
-        
-        .captcha-header {
-            background: linear-gradient(to right, #0f3460, #1a1a2e);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .captcha-header h2 {
-            font-size: 24px;
-            margin: 0;
-            background: none;
-            -webkit-text-fill-color: white;
-        }
-        
-        .captcha-coins-display {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 50px;
-            padding: 8px 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            font-size: 16px;
-        }
-        
-        .captcha-content {
-            padding: 25px;
-        }
-        
-        .captcha-target {
-            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
-            color: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 25px;
-            border: 2px solid #e94560;
-            text-align: center;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        
-        .captcha-target h3 {
-            margin-bottom: 20px;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            color: #e94560;
-        }
-        
-        .captcha-data-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .captcha-data-item:last-child {
-            border-bottom: none;
-        }
-        
-        .captcha-data-label {
-            font-weight: 600;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #b8b8d1;
-        }
-        
-        .captcha-data-value {
+
+        header h1 {
+            font-size: 1.3rem;
             font-weight: 700;
-            font-size: 18px;
-            color: #fff;
             letter-spacing: 0.5px;
         }
-        
-        .captcha-form-container {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 25px;
-            border: var(--glass-border);
-        }
-        
-        .captcha-form-group {
-            margin-bottom: 20px;
-        }
-        
-        .captcha-form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text);
-            font-size: 16px;
+
+        /* --- UPDATED INFO BUTTON (FAINTER VISIBILITY) --- */
+        .info-btn {
+            background: rgba(255, 255, 255, 0.1); /* Very low opacity background */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Faint border */
+            color: rgba(255, 255, 255, 0.5); /* Faint icon color */
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: serif;
+            transition: all 0.3s ease;
+            display: none; /* Hidden by default on Home */
+            backdrop-filter: blur(2px);
         }
-        
-        .captcha-check-btn {
-            background: linear-gradient(to right, #0f3460, #1a1a2e);
+
+        .info-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: var(--white);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* MAIN CONTENT AREA */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 90px; /* Extra space for bottom nav */
+            position: relative;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- BALANCE CARD --- */
+        .balance-card {
+            background: linear-gradient(135deg, var(--primary-color), #9d46ff);
             color: white;
-            border: none;
-            padding: 16px 30px;
-            font-size: 18px;
-            font-weight: 600;
-            border-radius: 10px;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s;
-            margin-top: 10px;
-        }
-        
-        /* ==================== ACCOUNT PAGE ==================== */
-        .profile-header { 
-            padding: 30px 20px; 
-            background: linear-gradient(to bottom, rgba(112, 0, 255, 0.1), transparent); 
+            padding: 25px;
+            border-radius: 20px;
             text-align: center;
-            border-bottom: var(--glass-border);
-        }
-        
-        .avatar {
-            width: 80px; 
-            height: 80px; 
-            background: var(--grad-main); 
-            border-radius: 50%;
-            margin: 0 auto 15px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            font-size: 32px; 
-            font-weight: bold; 
-            box-shadow: 0 10px 25px rgba(112, 0, 255, 0.4);
-            border: 4px solid rgba(255,255,255,0.1);
-        }
-        
-        .menu-item {
-            padding: 16px 20px; 
-            border-bottom: 1px solid rgba(255,255,255,0.05); 
-            cursor: pointer;
-            display: flex; 
-            align-items: center;
-            font-weight: 500; 
-            color: #e0e0e0; 
-            transition: all 0.3s;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(98, 0, 234, 0.3);
             position: relative;
             overflow: hidden;
-            font-size: 15px;
-            min-height: 60px;
         }
         
-        .menu-item:hover { 
-            background: rgba(112, 0, 255, 0.1);
-            transform: translateX(5px);
+        .balance-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 10%, transparent 10.5%),
+                        radial-gradient(circle, rgba(255,255,255,0.1) 10%, transparent 10.5%);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            opacity: 0.3;
+            pointer-events: none;
         }
-        
-        .menu-item span:last-child { 
-            color: var(--secondary); 
-            margin-left: auto; 
-            font-size: 18px;
-            transition: transform 0.3s;
+
+        .balance-amount {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 10px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        
-        .menu-item:hover span:last-child {
-            transform: translateX(5px);
-        }
-        
-        .menu-icon {
-            margin-right: 15px;
-            font-size: 20px;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border: var(--glass-border);
-            flex-shrink: 0;
-        }
-        
-        /* Account Page Colorful Icons */
-        .icon-redeem {
-            background: linear-gradient(135deg, #FFD700, #FFA500) !important;
-            color: #000 !important;
-        }
-        
-        .icon-transactions {
-            background: linear-gradient(135deg, #4CAF50, #2E7D32) !important;
-            color: white !important;
-        }
-        
-        .icon-bet {
-            background: linear-gradient(135deg, #2196F3, #0D47A1) !important;
-            color: white !important;
-        }
-        
-        .icon-purchase {
-            background: linear-gradient(135deg, #9C27B0, #6A1B9A) !important;
-            color: white !important;
-        }
-        
-        .icon-gift {
-            background: linear-gradient(135deg, #FF5722, #D84315) !important;
-            color: white !important;
-        }
-        
-        .icon-support {
-            background: linear-gradient(135deg, #00BCD4, #00838F) !important;
-            color: white !important;
-        }
-        
-        .icon-settings {
-            background: linear-gradient(135deg, #795548, #4E342E) !important;
-            color: white !important;
-        }
-        
-        /* ==================== SUB PAGES ==================== */
-        .sub-page { 
-            z-index: 60; 
-            background: var(--bg-dark); 
-        }
-        
-        .header-back { 
-            display: flex; 
-            align-items: center; 
-            padding: 20px; 
-            background: rgba(255,255,255,0.02); 
-            border-bottom: var(--glass-border);
-            font-size: 20px; 
-            font-weight: bold;
-            min-height: 70px;
-        }
-        
-        .back-btn { 
-            font-size: 28px; 
-            margin-right: 20px; 
-            cursor: pointer; 
-            color: var(--secondary);
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .history-item {
-            padding: 20px; 
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            min-height: 80px;
-        }
-        
-        .text-green { color: var(--success); }
-        .text-red { color: var(--danger); }
-        
-        /* ==================== MARKET PAGE STYLES ==================== */
-        .market-empty {
-            text-align: center;
-            padding: 40px 20px;
-            background: rgba(255, 255, 255, 0.03);
+
+        /* --- IMPROVED GAME UI STYLES --- */
+        .game-section {
+            background: var(--white);
             border-radius: 20px;
-            border: var(--glass-border);
-            margin: 20px 0;
-        }
-        
-        .market-empty-icon {
-            font-size: 50px;
-            margin-bottom: 20px;
-            opacity: 0.7;
-        }
-        
-        /* ==================== REDEEM PAGE STYLES ==================== */
-        .redeem-note {
-            background: rgba(255, 215, 0, 0.1);
-            border: 2px solid rgba(255, 215, 0, 0.3);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 25px 0 10px 0;
-        }
-        
-        .redeem-note h4 {
-            color: #FFD700;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .redeem-note p {
-            color: var(--text);
-            margin-bottom: 10px;
-            line-height: 1.5;
-            font-size: 14px;
-        }
-        
-        /* ==================== CAPTCHA MODAL STYLES ==================== */
-        .captcha-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.85);
-            z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-            padding: 20px;
-        }
-        
-        .captcha-results-modal {
-            background-color: rgba(30, 30, 40, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 15px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--primary);
-        }
-        
-        .captcha-modal-header {
-            background: linear-gradient(to right, #0f3460, #1a1a2e);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .captcha-close-modal {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-        
-        .captcha-modal-content {
             padding: 25px;
-            overflow-y: auto;
-            max-height: calc(90vh - 80px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid #e0e0e0;
         }
-        
-        .captcha-result-status {
-            font-size: 24px;
-            font-weight: 700;
+
+        .game-title {
+            font-size: 1.1rem;
+            color: var(--primary-dark);
             margin-bottom: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        
-        .captcha-success {
-            background: linear-gradient(135deg, rgba(46, 204, 113, 0.2), rgba(46, 204, 113, 0.1));
-            border: 2px solid var(--success);
-            color: var(--success);
-        }
-        
-        .captcha-error {
-            background: linear-gradient(135deg, rgba(255, 71, 87, 0.2), rgba(255, 71, 87, 0.1));
-            border: 2px solid var(--danger);
-            color: var(--danger);
-        }
-        
-        .captcha-comparison-container {
-            margin: 25px 0;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 20px;
-            border: 1px solid var(--surface);
-        }
-        
-        .captcha-comparison-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--secondary);
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
-        .captcha-comparison-row {
+
+        /* Enhanced Target Data Box */
+        .target-data {
+            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+            /* Adding a subtle tech pattern overlay */
+            background-image: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%), 
+                              repeating-linear-gradient(45deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 2px, transparent 2px, transparent 4px);
+            background-blend-mode: overlay;
+            color: white;
+            border-radius: 16px;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+            border: 1px solid #e94560;
+            box-shadow: inset 0 0 20px rgba(233, 69, 96, 0.2); /* Inner glow */
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .target-data.data-changing {
+            opacity: 0.6;
+            transform: scale(0.99);
+            filter: blur(1px);
+        }
+
+        .data-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 12px 0;
-            border-bottom: 1px solid var(--surface);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
         }
         
-        .captcha-comparison-row:last-child {
-            border-bottom: none;
+        .data-item:last-child { border-bottom: none; }
+
+        .data-label { color: #b8b8d1; font-size: 0.95rem; font-weight: 500; }
+        .data-value { font-weight: 700; font-size: 1.15rem; color: #fff; letter-spacing: 1px; text-shadow: 0 0 5px rgba(255,255,255,0.3); }
+
+        /* Improved Game Inputs */
+        .game-input-group { margin-bottom: 18px; }
+        .game-input-group label { 
+            display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 0.9rem; 
         }
-        
-        .captcha-field-name {
-            font-weight: 600;
-            color: var(--text);
-            width: 30%;
+        .game-input-group input {
+            width: 100%; 
+            padding: 14px; 
+            border: 2px solid #eee; 
+            background: #f9f9f9;
+            border-radius: 12px; 
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
-        
-        .captcha-user-value, .captcha-target-value {
-            width: 30%;
-            text-align: center;
-            padding: 5px 10px;
-            background-color: var(--surface);
-            border-radius: 5px;
-            font-weight: 500;
+        .game-input-group input:focus { 
+            border-color: var(--primary-color); 
+            background: var(--white);
+            box-shadow: 0 0 0 4px rgba(98, 0, 234, 0.1);
+            outline: none; 
         }
-        
-        .captcha-match-indicator {
-            width: 10%;
-            text-align: center;
-            font-size: 20px;
-        }
-        
-        .captcha-match-yes {
-            color: var(--success);
-        }
-        
-        .captcha-match-no {
-            color: var(--danger);
-        }
-        
-        .captcha-coins-info {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1));
-            border-radius: 10px;
-            padding: 20px;
-            margin: 25px 0;
-            text-align: center;
-            border: 2px solid rgba(255, 215, 0, 0.3);
-        }
-        
-        .captcha-modal-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 25px;
-        }
-        
-        .captcha-modal-btn {
-            flex: 1;
-            padding: 16px;
+
+        /* Improved Check Button */
+        .check-btn {
+            background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+            color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 17px;
-            font-weight: 600;
+            padding: 16px;
+            width: 100%;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: 0.5px;
             cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            box-shadow: 0 6px 15px rgba(98, 0, 234, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        
-        .captcha-claim-btn {
-            background: linear-gradient(to right, #e94560, #ff6b8b);
-            color: white;
-        }
-        
-        .captcha-new-data-btn {
-            background: linear-gradient(to right, #0f3460, #1a1a2e);
-            color: white;
-        }
-        
-        /* ==================== CUSTOM STYLES ==================== */
-        .first-read-link {
-            color: var(--secondary);
-            font-size: 14px;
-            text-align: center;
+        .check-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(98, 0, 234, 0.4); }
+        .check-btn:active { transform: translateY(1px); box-shadow: 0 2px 10px rgba(98, 0, 234, 0.3); }
+
+        /* --- STANDARD FORM ELEMENTS (Buy/Redeem) --- */
+        .form-group {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 15px;
             margin-bottom: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: underline;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
+        .standard-label { display: block; margin-bottom: 10px; color: var(--gray); font-weight: 600; font-size: 0.9rem; }
+        select, .standard-input {
+            width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; outline: none; background: #fafafa; transition: border 0.3s;
+        }
+        select:focus, .standard-input:focus { border-color: var(--primary-color); background: #fff; }
+
+        .cost-display {
+            background-color: #ede7f6; color: var(--primary-dark); padding: 15px; border-radius: 10px; 
+            font-weight: bold; text-align: center; margin-bottom: 20px; border: 1px solid #d1c4e9; font-size: 1.1rem;
+        }
+        .action-btn {
+            width: 100%; padding: 16px; background-color: var(--primary-color); color: white; border: none; 
+            border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* --- BOTTOM NAV --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: var(--white);
+            display: flex; justify-content: space-around; padding: 15px 0;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 20; border-top-left-radius: 25px; border-top-right-radius: 25px;
+        }
+        .nav-item { text-align: center; color: #aaa; cursor: pointer; flex: 1; transition: color 0.3s; }
+        .nav-item.active { color: var(--primary-color); }
+        .nav-icon { font-size: 1.5rem; margin-bottom: 4px; display: block; }
+        .nav-text { font-size: 0.75rem; font-weight: 700; }
+
+        /* --- MODALS --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+            display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+        .modal-box {
+            background: var(--white); width: 100%; max-width: 380px; padding: 30px; border-radius: 25px;
+            text-align: center; position: relative; animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        @keyframes popUp { from{transform: scale(0.8) translateY(20px); opacity:0;} to{transform: scale(1) translateY(0); opacity:1;} }
         
-        .first-read-link:hover {
-            color: var(--primary);
-        }
+        .result-status { font-size: 1.3rem; font-weight: 800; margin-bottom: 20px; padding: 15px; border-radius: 12px; }
+        .success { color: #006400; background: #d4edda; border: 1px solid #c3e6cb; }
+        .error { color: #721c24; background: #f8d7da; border: 1px solid #f5c6cb; }
         
-        .instructions-content {
-            text-align: left;
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 10px;
+        .comparison-box { background: #f1f3f5; padding: 15px; border-radius: 12px; margin: 20px 0; text-align: left; font-size: 0.95rem; border: 1px solid #e9ecef;}
+        .comp-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #dde2e6; padding-bottom: 8px; }
+        .comp-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
+        .match-yes { color: #28a745; font-size: 1.2rem; }
+        .match-no { color: #dc3545; font-size: 1.2rem; }
+
+        .modal-btn {
+            width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: transform 0.2s;
         }
-        
-        .instructions-content h3 {
-            font-size: 22px;
-            margin-bottom: 15px;
-            color: var(--secondary);
+        .modal-btn:hover { transform: translateY(-3px); }
+        .claim-btn { background: linear-gradient(to right, #e94560, #ff6b8b); color: white; box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4); }
+        .retry-btn { background: linear-gradient(to right, #343a40, #495057); color: white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+
+        /* Info Modal specifics */
+        .info-modal-box {
+            background: white; width: 90%; max-width: 320px; padding: 25px; border-radius: 20px; position: relative; text-align: center;
         }
-        
-        .instructions-content p {
-            margin-bottom: 15px;
-            line-height: 1.6;
-            color: var(--text);
-        }
-        
-        .instructions-content strong {
-            color: var(--secondary);
-        }
-        
-        .important-note {
-            color: #FFD700;
-            font-weight: 600;
-            margin: 20px 0;
-            padding: 15px;
-            text-align: center;
-            font-size: 16px;
-            border-left: 3px solid #FFD700;
-            border-right: 3px solid #FFD700;
-            background: rgba(255, 215, 0, 0.05);
-        }
-        
-        /* ==================== RESPONSIVE DESIGN ==================== */
-        @media (max-width: 768px) {
-            .container { padding: 20px; }
-            h2 { font-size: 24px; margin-bottom: 20px; }
-            
-            .auth-card {
-                padding: 30px 20px;
-                width: 95%;
-            }
-            
-            .nav-bar {
-                width: 94%;
-                bottom: 15px;
-                height: 65px;
-            }
-            
-            .nav-icon {
-                width: 34px;
-                height: 34px;
-                font-size: 18px;
-            }
-            
-            .nav-item {
-                font-size: 10px;
-            }
-            
-            .game-board {
-                max-width: 280px;
-            }
-            
-            .cell {
-                font-size: 2rem;
-            }
-            
-            .instructions-content {
-                max-height: 350px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            h2 { font-size: 22px; }
-            
-            .container { padding: 15px; }
-            
-            .nav-bar {
-                width: 96%;
-                border-radius: 18px;
-                height: 60px;
-            }
-            
-            .nav-icon {
-                width: 32px;
-                height: 32px;
-                font-size: 16px;
-            }
-            
-            .game-board {
-                max-width: 260px;
-            }
-            
-            .cell {
-                font-size: 1.8rem;
-            }
-            
-            .instructions-content {
-                max-height: 300px;
-            }
-            
-            .first-read-link {
-                font-size: 13px;
-            }
-        }
+        .close-info { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; cursor: pointer; color: #aaa; transition: color 0.3s;}
+        .close-info:hover { color: var(--red); }
+
     </style>
 </head>
 <body>
 
-    <!-- Toast Notification Container -->
-    <div id="toast-container"></div>
+    <header>
+        <h1 id="page-title">Home</h1>
+        <div class="info-btn" id="infoBtn">i</div>
+    </header>
 
-    <!-- ==================== REGISTER SCREEN ==================== -->
-    <div id="register-screen" class="full-screen center-flex">
-        <!-- Instructions Popup -->
-        <div id="instructions-popup" class="popup-overlay hidden">
-            <div class="popup-card">
-                <span class="close-btn" onclick="closeInstructionsPopup()">&times;</span>
-                <div class="instructions-content">
-                    <h3>How does it work? 🤔</h3>
-                    
-                    <p><strong>Dynamic Code & Village Challenge</strong><br>
-                    Every time you will see a new code on the captcha screen. These codes and village names are random every time - sometimes numeric cipher, sometimes word puzzle, sometimes map-based - will dare your thinking power!</p>
-                    
-                    <p><strong>Tic Tac Toe AI Battle</strong><br>
-                    The second option of captcha is a fast-paced Tic Tac Toe game, where you play against a smart AI. The game is limited to 3 moves - you have to either win or draw. Every win gives you 25 Coins!</p>
-                    
-                    <div class="important-note">
-                        <i class="fas fa-exclamation-triangle"></i> 
-                        NOTE: We have made the app just for fun we are not giving real money. This app is for entertainment purposes only and you cannot earn real money from it.
-                    </div>
-                    
-                    <p><strong>New Challenges Every Day</strong><br>
-                    Every day your knowledge is tested with new codes and new villages. From villages of India to global villages - you will get to learn something new every day.</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="register-form" class="auth-card">
-            <h2>CREATE ACCOUNT</h2>
-            
-            <div class="first-read-link" onclick="showInstructionsPopup()">
-                <i class="fas fa-info-circle"></i> FIRST READ THIS
-            </div>
-            
-            <div class="input-group">
-                <div class="input-icon"><i class="fas fa-phone"></i></div>
-                <input type="number" id="reg-phone" placeholder="Phone Number" pattern="[0-9]*" inputmode="numeric">
-            </div>
-            <div class="input-group">
-                <div class="input-icon"><i class="fas fa-user"></i></div>
-                <input type="text" id="reg-name" placeholder="Full Name">
-            </div>
-            <div class="input-group">
-                <div class="input-icon"><i class="fas fa-lock"></i></div>
-                <input type="password" id="reg-pass" placeholder="Password (Min 6 characters)">
-            </div>
-            <div class="input-group">
-                <div class="input-icon"><i class="fas fa-lock"></i></div>
-                <input type="password" id="reg-repass" placeholder="Re-enter Password">
-            </div>
-            <button onclick="register()">REGISTER NOW</button>
-        </div>
-    </div>
-
-    <!-- ==================== APP SCREEN ==================== -->
-    <div id="app-screen" class="full-screen hidden">
+    <div class="app-content">
         
-        <!-- Top Right Coin Display -->
-        <div class="top-coin-display">
-            <div class="top-coin-icon">🪙</div>
-            <div class="top-coin-amount" id="top-coin-amount">0</div>
-        </div>
-        
-        <!-- Welcome Gift Popup (ONLY for NEW registered users) -->
-        <div id="gift-popup" class="popup-overlay hidden">
-            <div class="popup-card">
-                <span class="close-btn" onclick="closePopup('gift-popup')">&times;</span>
-                <h3 style="color:var(--secondary)">HEY <span id="gift-username"></span>!</h3>
-                <p style="margin-top:10px; color:var(--text-muted)">WE HAVE A GIFT FOR YOU</p>
-                <div class="coin-anim">💰</div>
-                <h2 style="margin:0">50 COINS</h2>
-                <button onclick="showAdAndThen(claimWelcomeGift)">RECEIVE GIFT</button>
+        <div id="home-page" class="page active">
+            <div class="balance-card">
+                <p style="font-weight: 600; opacity: 0.9;">Your Balance</p>
+                <div class="balance-amount"><span id="user-points">0</span> Pts</div>
+                <p style="font-size: 0.9rem; opacity: 0.9; font-weight: 500;"><i class="fas fa-arrow-down"></i> Play below to earn points!</p>
             </div>
+
+            <div class="game-section">
+                <div class="game-title"><i class="fas fa-shield-alt"></i> Village Code Validator</div>
+                
+                <div class="target-data" id="target-data-box">
+                    <div class="data-item">
+                        <span class="data-label"><i class="fas fa-user-circle"></i> Name:</span>
+                        <span class="data-value" id="target-name">...</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label"><i class="fas fa-map-marker-alt"></i> Village:</span>
+                        <span class="data-value" id="target-village">...</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label"><i class="fas fa-fingerprint"></i> Code:</span>
+                        <span class="data-value" id="target-code">...</span>
+                    </div>
+                </div>
+
+                <div class="game-input-group">
+                    <label>Enter Name</label>
+                    <input type="text" id="game-name" placeholder="Type the name exactly as shown" autocomplete="off">
+                </div>
+                <div class="game-input-group">
+                    <label>Enter Village</label>
+                    <input type="text" id="game-village" placeholder="Type the village name" autocomplete="off">
+                </div>
+                <div class="game-input-group">
+                    <label>Enter Code</label>
+                    <input type="text" id="game-code" placeholder="e.g. A1234" autocomplete="off">
+                </div>
+
+                <button class="check-btn" onclick="checkGameResult()">
+                    <i class="fas fa-check-double"></i> VERIFY & EARN
+                </button>
+            </div>
+            <div style="height: 30px;"></div>
         </div>
 
-        <div id="main-app">
+        <div id="buy-page" class="page">
+            <div class="form-group">
+                <label class="standard-label">Select Service</label>
+                <select id="service-select">
+                    <option value="insta_follow" data-cost="1000" data-qty="100">INSTA FOLLOW</option>
+                    <option value="insta_like" data-cost="1000" data-qty="500">INSTA LIKE</option>
+                    <option value="insta_view" data-cost="1000" data-qty="5000">INSTA VIEW</option>
+                    <option value="yt_sub" data-cost="1500" data-qty="100">YT SUBSCRIBE</option>
+                    <option value="yt_like" data-cost="1000" data-qty="400">YT LIKE</option>
+                    <option value="yt_view" data-cost="1000" data-qty="800">YT VIEW</option>
+                    <option value="fb_follow" data-cost="1000" data-qty="100">FB FOLLOW</option>
+                    <option value="fb_like" data-cost="1000" data-qty="500">FB LIKE</option>
+                    <option value="fb_view" data-cost="1000" data-qty="4000">FB VIEW</option>
+                </select>
+            </div>
+
+            <div class="cost-display" id="rate-display">1000 points = 100 follow</div>
+
+            <div class="form-group">
+                <label class="standard-label">Enter Link (ID/Post URL)</label>
+                <input type="text" class="standard-input" id="campaign-link" placeholder="https://...">
+            </div>
+
+            <button class="action-btn" onclick="createCampaign()"><i class="fas fa-rocket"></i> Create Campaign</button>
+        </div>
+
+        <div id="wallet-page" class="page">
+            <div class="balance-card">
+                <p>Current Balance</p>
+                <h2 id="wallet-balance" class="balance-amount">0</h2>
+            </div>
+
+            <div class="form-group">
+                <label class="standard-label">Enter Points to Redeem</label>
+                <input type="number" class="standard-input" id="redeem-coins" placeholder="Min 5000" oninput="calculateInr()">
+                <div style="color:var(--red); font-size:0.85rem; display:none; margin-top:8px; font-weight:500;" id="redeem-error"><i class="fas fa-exclamation-circle"></i> Minimum redeem is 5000 points.</div>
+            </div>
+
+            <div class="cost-display" id="inr-display" style="background:#e0f2f1; color:#00695c; border-color:#b2dfdb;">You will receive: ₹0</div>
+
+            <div class="form-group">
+                <label class="standard-label">Payment Email / UPI</label>
+                <input type="email" class="standard-input" id="redeem-email" placeholder="example@email.com">
+            </div>
+
+            <button class="action-btn" onclick="redeemPoints()" style="background: var(--secondary-color);"><i class="fas fa-money-bill-wave"></i> REDEEM NOW</button>
+        </div>
+
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('home')">
+            <span class="nav-icon"><i class="fas fa-home"></i></span>
+            <span class="nav-text">HOME</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('buy')">
+            <span class="nav-icon"><i class="fas fa-shopping-cart"></i></span>
+            <span class="nav-text">BUY</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('wallet')">
+            <span class="nav-icon"><i class="fas fa-wallet"></i></span>
+            <span class="nav-text">WALLET</span>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="gameResultModal">
+        <div class="modal-box">
+            <div id="game-status-msg" class="result-status">Checking...</div>
             
-            <!-- Home Page -->
-            <div id="page-home" class="page-content">
-                <div class="container">
-                    <h2>CHOOSE YOUR GAME</h2>
-                    <div class="games-menu">
-                        <div class="game-menu-item" id="tictactoe-menu-item" onclick="showAdAndThen(() => openGamePage('tictactoe'))">
-                            <div class="game-menu-icon">
-                                <i class="fas fa-gamepad"></i>
-                            </div>
-                            <div class="game-menu-details">
-                                <h3>TIC TAC TOE</h3>
-                                <p>Play against AI and win 25 coins per win</p>
-                                <p style="color: var(--success); font-size: 12px;"><i class="fas fa-unlock"></i> Unlimited Plays</p>
-                            </div>
-                            <div class="game-menu-arrow">›</div>
-                        </div>
-                        
-                        <div class="game-menu-item" id="captcha-menu-item" onclick="checkCaptchaLockWithAd()">
-                            <div class="game-menu-icon">
-                                <i class="fas fa-keyboard"></i>
-                            </div>
-                            <div class="game-menu-details">
-                                <h3>CAPTCHA TYPING</h3>
-                                <p>Type the correct data to earn 25 coins</p>
-                                <p id="captcha-limit-status" style="color: var(--warning); font-size: 12px;"><i class="fas fa-clock"></i> 8 attempts per session</p>
-                            </div>
-                            <div class="game-menu-arrow">›</div>
-                            <div id="captcha-lock-badge" class="lock-badge hidden">LOCKED</div>
-                        </div>
-                    </div>
+            <div class="comparison-box">
+                <div class="comp-row">
+                    <span>Name:</span> <span id="res-name-match">-</span>
+                </div>
+                <div class="comp-row">
+                    <span>Village:</span> <span id="res-village-match">-</span>
+                </div>
+                <div class="comp-row">
+                    <span>Code:</span> <span id="res-code-match">-</span>
                 </div>
             </div>
 
-            <!-- Tic Tac Toe Game Page -->
-            <div id="page-tictactoe" class="full-screen sub-page hidden">
-                <div class="tictactoe-game-container">
-                    <div class="tictactoe-header">
-                        <h2><i class="fas fa-gamepad"></i> TIC TAC TOE</h2>
-                        <div class="tictactoe-coins-display">
-                            <span id="tictactoe-coins-display">0</span>
-                            <span>🪙</span>
-                        </div>
-                    </div>
-                    
-                    <div class="back-header">
-                        <div class="back-btn-game" onclick="showAdAndThen(backToHome)">←</div>
-                        <div class="game-title">Tic Tac Toe</div>
-                    </div>
-                    
-                    <div class="tictactoe-content">
-                        <div class="difficulty-selector">
-                            <label><i class="fas fa-robot"></i> AI Difficulty:</label>
-                            <select id="difficulty">
-                                <option value="0.9" selected>Hard (10% win chance)</option>
-                                <option value="1">Impossible (0% win chance)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="game-board" id="board">
-                            <div class="cell" data-index="0"></div>
-                            <div class="cell" data-index="1"></div>
-                            <div class="cell" data-index="2"></div>
-                            <div class="cell" data-index="3"></div>
-                            <div class="cell" data-index="4"></div>
-                            <div class="cell" data-index="5"></div>
-                            <div class="cell" data-index="6"></div>
-                            <div class="cell" data-index="7"></div>
-                            <div class="cell" data-index="8"></div>
-                        </div>
-                        
-                        <div class="game-status" id="status">Your Turn (X)</div>
-                        
-                        <div class="game-controls">
-                            <button class="restart-btn" onclick="showAdAndThen(resetTicTacToe)">RESTART GAME</button>
-                        </div>
-                    </div>
-                </div>
+            <div id="win-area" style="display:none;">
+                <p style="color:#e67700; font-weight:800; font-size: 1.2rem; margin-bottom:15px;"><i class="fas fa-coins"></i> Reward: 25 Points</p>
+                <button class="modal-btn claim-btn" onclick="claimReward()">Claim Reward</button>
             </div>
-
-            <!-- Win Panel -->
-            <div class="win-panel" id="winPanel">
-                <div class="win-card">
-                    <div class="win-title">YOU WON!</div>
-                    <div class="win-reward">+25</div>
-                    <div class="win-sub">COINS</div>
-                    <button class="collect-btn" onclick="showAdAndThen(collectTicTacToeCoins)">COLLECT</button>
-                </div>
-            </div>
-
-            <!-- Lose Panel -->
-            <div class="lose-panel" id="losePanel">
-                <div class="lose-card">
-                    <div class="lose-title">AI WON!</div>
-                    <button class="lose-btn" onclick="showAdAndThen(closeLosePanel)">TRY AGAIN</button>
-                </div>
-            </div>
-
-            <!-- Captcha Typing Game Page -->
-            <div id="page-captcha" class="full-screen sub-page hidden">
-                <div class="captcha-game-container">
-                    <div class="captcha-header">
-                        <h2><i class="fas fa-keyboard"></i> CAPTCHA TYPING</h2>
-                        <div class="captcha-coins-display">
-                            <span id="captcha-coins-display">0</span>
-                            <span>🪙</span>
-                        </div>
-                    </div>
-                    
-                    <div class="back-header" style="padding: 20px;">
-                        <div class="back-btn-game" onclick="showAdAndThen(backToHome)">←</div>
-                        <div class="game-title">Type the Correct Data</div>
-                    </div>
-                    
-                    <div class="captcha-content">
-                        <div class="captcha-target" id="captcha-target">
-                            <h3><i class="fas fa-bullseye"></i> Replicate This Data</h3>
-                            <div class="captcha-data-item">
-                                <div class="captcha-data-label">
-                                    <i class="fas fa-user"></i> Name:
-                                </div>
-                                <div class="captcha-data-value" id="captcha-target-name">Ava Lee</div>
-                            </div>
-                            <div class="captcha-data-item">
-                                <div class="captcha-data-label">
-                                    <i class="fas fa-home"></i> Village:
-                                </div>
-                                <div class="captcha-data-value" id="captcha-target-village">Graffelfree</div>
-                            </div>
-                            <div class="captcha-data-item">
-                                <div class="captcha-data-label">
-                                    <i class="fas fa-key"></i> Code:
-                                </div>
-                                <div class="captcha-data-value" id="captcha-target-code">O5535</div>
-                            </div>
-                        </div>
-                        
-                        <div class="captcha-form-container">
-                            <div class="captcha-form-group">
-                                <label for="captcha-name"><i class="fas fa-user"></i> Enter Name and Surname</label>
-                                <input type="text" id="captcha-name" placeholder="Type the name shown above" autocomplete="off">
-                            </div>
-                            
-                            <div class="captcha-form-group">
-                                <label for="captcha-village"><i class="fas fa-home"></i> Enter Village Name</label>
-                                <input type="text" id="captcha-village" placeholder="Type the village shown above" autocomplete="off">
-                            </div>
-                            
-                            <div class="captcha-form-group">
-                                <label for="captcha-code"><i class="fas fa-key"></i> Enter Code (Letter + 4 Numbers)</label>
-                                <input type="text" id="captcha-code" placeholder="Type the code shown above" autocomplete="off">
-                            </div>
-                            
-                            <button class="captcha-check-btn" id="captcha-check-btn" onclick="showAdAndThen(checkCaptchaMatch)">
-                                <i class="fas fa-check-circle"></i> Check Match
-                            </button>
-                            <div style="text-align: center; margin-top: 15px; color: var(--warning); font-size: 14px;">
-                                <i class="fas fa-info-circle"></i> Attempts Left Today: <span id="captcha-attempts-left">8</span>/8
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Captcha Results Modal -->
-            <div id="captcha-modal-overlay" class="captcha-modal-overlay">
-                <div class="captcha-results-modal">
-                    <div class="captcha-modal-header">
-                        <h2><i class="fas fa-poll"></i> Validation Results</h2>
-                        <button class="captcha-close-modal" onclick="closeCaptchaModal()">&times;</button>
-                    </div>
-                    
-                    <div class="captcha-modal-content">
-                        <div class="captcha-result-status" id="captcha-result-status">
-                            Checking your entries...
-                        </div>
-                        
-                        <div class="captcha-comparison-container">
-                            <div class="captcha-comparison-title">
-                                <i class="fas fa-exchange-alt"></i> Entry Comparison
-                            </div>
-                            
-                            <div class="captcha-comparison-row">
-                                <div class="captcha-field-name">Name:</div>
-                                <div class="captcha-user-value" id="captcha-user-name-display">-</div>
-                                <div class="captcha-target-value" id="captcha-target-name-display">-</div>
-                                <div class="captcha-match-indicator" id="captcha-name-match">-</div>
-                            </div>
-                            
-                            <div class="captcha-comparison-row">
-                                <div class="captcha-field-name">Village:</div>
-                                <div class="captcha-user-value" id="captcha-user-village-display">-</div>
-                                <div class="captcha-target-value" id="captcha-target-village-display">-</div>
-                                <div class="captcha-match-indicator" id="captcha-village-match">-</div>
-                            </div>
-                            
-                            <div class="captcha-comparison-row">
-                                <div class="captcha-field-name">Code:</div>
-                                <div class="captcha-user-value" id="captcha-user-code-display">-</div>
-                                <div class="captcha-target-value" id="captcha-target-code-display">-</div>
-                                <div class="captcha-match-indicator" id="captcha-code-match">-</div>
-                            </div>
-                        </div>
-                        
-                        <div class="captcha-coins-info">
-                            <i class="fas fa-coins"></i>
-                            <div class="captcha-coins-text" id="captcha-coins-text">You can earn coins!</div>
-                        </div>
-                        
-                        <div class="captcha-modal-actions">
-                            <button class="captcha-modal-btn captcha-claim-btn" id="captcha-claim-btn" onclick="showAdAndThen(claimCaptchaCoins)">
-                                <i class="fas fa-gift"></i> Claim Coins
-                            </button>
-                            <button class="captcha-modal-btn captcha-new-data-btn" id="captcha-new-data-btn" onclick="showAdAndThen(closeCaptchaModal)">
-                                <i class="fas fa-redo"></i> Try New Data
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Market Page -->
-            <div id="page-market" class="page-content hidden">
-                <div class="container">
-                    <h2>Premium Market</h2>
-                    <!-- Market Ad -->
-                    <div id="container-e1ed977cdea719feb9c702a6af62d3ad"></div>
-                    <div id="market-list">
-                        <div class="market-empty">
-                            <div class="market-empty-icon">🛒</div>
-                            <h3>No Products Available</h3>
-                            <p>Products will be added soon by admin</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Redeem Page -->
-            <div id="page-redeem" class="page-content hidden">
-                <div class="container">
-                    <h2>Withdraw Funds</h2>
-                    <div style="background: var(--surface); padding: 20px; border-radius: 16px; margin-bottom: 25px; border: var(--glass-border);">
-                        <div style="color: var(--text-muted); font-size: 14px; margin-bottom: 10px;">
-                            <i class="fas fa-info-circle"></i> 1200 Coins = ₹10
-                        </div>
-                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1)">
-                             Current Balance: <span id="redeem-balance" class="text-green" style="font-weight:bold">0</span>
-                        </div>
-                        <div style="margin-top: 10px; color: var(--warning); font-size: 14px;">
-                            <i class="fas fa-info-circle"></i> Minimum Withdrawal: 1200 Coins (₹10)
-                        </div>
-                    </div>
-                    
-                    <div class="input-group"><div class="input-icon"><i class="fas fa-user"></i></div><input type="text" id="redeem-name" placeholder="Account Name"></div>
-                    <div class="input-group"><div class="input-icon"><i class="fas fa-coins"></i></div><input type="number" id="redeem-amount" placeholder="Coins to Withdraw (Min 1200)" pattern="[0-9]*" inputmode="numeric"></div>
-                    <button onclick="showAdAndThen(processRedeem)">REDEEM NOW</button>
-                </div>
-            </div>
-
-            <!-- Account Page -->
-            <div id="page-account" class="page-content hidden">
-                <div class="profile-header">
-                    <div class="avatar" id="acc-avatar">U</div>
-                    <h3 id="acc-username" style="font-size: 22px;">Username</h3>
-                    <p style="color: var(--secondary); font-size: 15px;" id="acc-phone">+91 9999999999</p>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-top:2px; letter-spacing: 1px;">UID: <span id="acc-uid">000000</span></p>
-                    <h2 style="color: var(--success); margin-top: 15px; font-size: 28px;" id="acc-coins">0</h2>
-                </div>
-                <div class="menu-list" style="background: var(--bg-dark);">
-                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-redeem-hist'))">
-                        <span class="menu-icon icon-redeem"><i class="fas fa-wallet"></i></span> REDEEM HISTORY <span>&#10095;</span>
-                    </div>
-                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-trans-hist'))">
-                        <span class="menu-icon icon-transactions"><i class="fas fa-exchange-alt"></i></span> TRANSACTIONS <span>&#10095;</span>
-                    </div>
-                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-bet-hist'))">
-                        <span class="menu-icon icon-bet"><i class="fas fa-dice"></i></span> BET HISTORY <span>&#10095;</span>
-                    </div>
-                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-buy-hist'))">
-                        <span class="menu-icon icon-purchase"><i class="fas fa-shopping-bag"></i></span> PURCHASE HISTORY <span>&#10095;</span>
-                    </div>
-                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-gift'))">
-                        <span class="menu-icon icon-gift"><i class="fas fa-gift"></i></span> GIFT CODE <span>&#10095;</span>
-                    </div>
-                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-setting'))">
-                        <span class="menu-icon icon-settings"><i class="fas fa-cog"></i></span> SETTINGS <span>&#10095;</span>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Navbar -->
-        <div class="nav-bar">
-            <div class="nav-item active" onclick="showAdAndThenNav('home', this)">
-                <span class="nav-icon"><i class="fas fa-home"></i></span>
-                <span>HOME</span>
-            </div>
-            <div class="nav-item" onclick="showAdAndThenNav('market', this)">
-                <span class="nav-icon"><i class="fas fa-shopping-cart"></i></span>
-                <span>MARKET</span>
-            </div>
-            <div class="nav-item" onclick="showAdAndThenNav('redeem', this)">
-                <span class="nav-icon"><i class="fas fa-wallet"></i></span>
-                <span>REDEEM</span>
-            </div>
-            <div class="nav-item" onclick="showAdAndThenNav('account', this)">
-                <span class="nav-icon"><i class="fas fa-user"></i></span>
-                <span>ACCOUNT</span>
+            
+            <div id="lose-area" style="display:none;">
+                 <p style="color:#721c24; margin-bottom:15px;">Make sure all fields match exactly.</p>
+                <button class="modal-btn retry-btn" onclick="resetGame()"><i class="fas fa-redo-alt"></i> Try Again</button>
             </div>
         </div>
     </div>
 
-    <!-- ==================== SUBPAGES ==================== -->
-    
-    <!-- Redeem History -->
-    <div id="sub-redeem-hist" class="full-screen sub-page hidden">
-        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-redeem-hist'))">&#8592;</span> Redeem History</div>
-        <div id="list-redeem-hist"></div>
-    </div>
-
-    <!-- Transaction History -->
-    <div id="sub-trans-hist" class="full-screen sub-page hidden">
-        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-trans-hist'))">&#8592;</span> Transactions</div>
-        <div id="list-trans-hist"></div>
-    </div>
-
-    <!-- Bet History -->
-    <div id="sub-bet-hist" class="full-screen sub-page hidden">
-        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-bet-hist'))">&#8592;</span> Bet History</div>
-        <div id="list-bet-hist"></div>
-    </div>
-
-    <!-- Purchase History -->
-    <div id="sub-buy-hist" class="full-screen sub-page hidden">
-        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-buy-hist'))">&#8592;</span> Purchase History</div>
-        <div id="list-buy-hist"><p style="text-align:center; padding:30px; color:var(--text-muted);">No purchases yet.</p></div>
-    </div>
-
-    <!-- Gift Code -->
-    <div id="sub-gift" class="full-screen sub-page hidden">
-        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-gift'))">&#8592;</span> Gift Code</div>
-        <div class="container">
-            <h3 style="margin-bottom: 15px; text-align: center;">CLAIM YOUR REWARD</h3>
-            <div class="input-group"><div class="input-icon"><i class="fas fa-gift"></i></div><input type="text" id="gift-code-input" placeholder="Enter Promo Code" style="text-transform: uppercase;"></div>
-            <button onclick="showAdAndThen(redeemGiftCode)">CLAIM CODE</button>
-            
-            <h4 style="margin-top: 40px; margin-bottom: 15px; padding-left: 10px; border-left: 3px solid var(--secondary);">CLAIM HISTORY</h4>
-            <div id="list-gift-hist"></div>
-        </div>
-    </div>
-
-    <!-- Settings -->
-    <div id="sub-setting" class="full-screen sub-page hidden">
-        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-setting'))">&#8592;</span> Settings</div>
-        <div class="container">
-            <h3 style="margin-bottom: 15px;">Update Profile</h3>
-            <div class="input-group"><div class="input-icon"><i class="fas fa-user"></i></div><input type="text" id="set-new-name" placeholder="New Display Name"></div>
-            <button onclick="showAdAndThen(changeName)">UPDATE NAME</button>
-            
-            <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 30px 0;">
-            
-            <h3 style="margin-bottom: 15px;">Security</h3>
-            <div class="input-group"><div class="input-icon"><i class="fas fa-lock"></i></div><input type="password" id="set-old-pass" placeholder="Current Password"></div>
-            <div class="input-group"><div class="input-icon"><i class="fas fa-lock"></i></div><input type="password" id="set-new-pass" placeholder="New Password (Min 6 characters)"></div>
-            <div class="input-group"><div class="input-icon"><i class="fas fa-lock"></i></div><input type="password" id="set-renew-pass" placeholder="Confirm New Password"></div>
-            <button onclick="showAdAndThen(changePass)" class="danger">CHANGE PASSWORD</button>
+    <div class="modal-overlay" id="infoModal">
+        <div class="info-modal-box">
+            <span class="close-info" onclick="document.getElementById('infoModal').style.display='none'">&times;</span>
+            <h3 style="color:var(--red); display:flex; align-items:center; justify-content:center; gap:10px;"><i class="fas fa-exclamation-triangle"></i> NOTE</h3>
+            <p style="font-weight:800; margin:20px 0; font-size:1.1rem;">REWARDS ARE NOT GUARANTEED</p>
+            <p style="font-size:0.9rem; color:#666; line-height:1.5;">Campaigns and redemptions are processed subject to availability and network conditions.</p>
         </div>
     </div>
 
     <script>
-        // ==================== FIREBASE CONFIGURATION ====================
-        const firebaseConfig = {
-            apiKey: "AIzaSyB_AlKeHmIccgGSpxsrIx9O8ejZOMeZFyM",
-            authDomain: "ar-movie-d34d4.firebaseapp.com",
-            databaseURL: "https://ar-movie-d34d4-default-rtdb.firebaseio.com",
-            projectId: "ar-movie-d34d4",
-            storageBucket: "ar-movie-d34d4.firebasestorage.app",
-            messagingSenderId: "1043649517626",
-            appId: "1:1043649517626:web:f127b33a9b5b5b0338fd03"
+        // --- GLOBAL VARIABLES ---
+        // POINT 0: Initial balance set to 0
+        let currentPoints = 0; 
+        
+        // --- GAME DATA ARRAYS ---
+        const firstNames = ["Ava", "Emma", "Sophia", "Olivia", "Isabella", "Mia", "Charlotte", "Amelia", "Harper", "Evelyn", "Raj", "Amit", "Priya", "Rahul", "Vikram", "Anita"];
+        const lastNames = ["Lee", "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Kumar", "Singh", "Sharma", "Verma", "Patel", "Gupta"];
+        const fakeVillages = ["Graffelfree", "Zorblaxia", "Quibbleton", "Fizzletown", "Rampur", "Dholakpur", "Bumbleburg", "Noodleham", "Chandrapur", "Sundarnagar"];
+
+        // Game State Variables
+        let targetName = "";
+        let targetVillage = "";
+        let targetCode = "";
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            updateBalanceUI();
+            generateGameData();
         };
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        
-        // ==================== GLOBAL VARIABLES ====================
-        let currentUser = null;
-        let currentUserId = null;
-        let products = [];
-        let giftCodes = [];
-        let appSettings = {};
-        
-        // Tic Tac Toe Variables
-        let boardState = ["", "", "", "", "", "", "", "", ""];
-        let ticTacToeGameActive = true;
-        let ticTacToeCurrentPlayer = "X";
-        const aiPlayer = "O";
-        let aiDifficulty = 0.9;
-        
-        // Captcha Variables
-        const firstNames = ["Ava", "Emma", "Sophia", "Olivia", "Isabella", "Mia", "Charlotte", "Amelia", "Harper", "Evelyn"];
-        const lastNames = ["Lee", "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez"];
-        const fakeVillages = ["Graffelfree", "Zorblaxia", "Quibbleton", "Fizzletown", "Glimmerfall", "Snickerdoodle", "Wobbleburg", "Jabberwock"];
-        let captchaTargetName = '';
-        let captchaTargetVillage = '';
-        let captchaTargetCode = '';
-        
-        // Captcha Lock System Variables
-        let captchaTimerInterval = null;
-        const CAPTCHA_DAILY_LIMIT = 8;
-        const CAPTCHA_LOCK_DURATION = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
-        
-        // ==================== FIREBASE REFERENCES ====================
-        const usersRef = database.ref('users');
-        const productsRef = database.ref('products');
-        const giftCodesRef = database.ref('giftCodes');
-        const settingsRef = database.ref('settings');
-        const adminDataRef = database.ref('adminData');
-        
-        // ==================== AD FUNCTIONS ====================
-        function showAdAndThen(callback) {
-            try {
-                console.log("Showing ads before action...");
-                
-                // Show first ad
-                if (typeof a0342166e2530539295a4706d13f5639 !== 'undefined') {
-                    a0342166e2530539295a4706d13f5639();
-                }
-                
-                // Show second ad in new tab
-                setTimeout(() => {
-                    window.open('https://www.effectivegatecpm.com/chn529mqq?key=e43f100690669e24e1f98d64eb3f1982', '_blank');
-                }, 100);
-                
-                // Show third ad in new tab
-                setTimeout(() => {
-                    window.open('https://www.effectivegatecpm.com/abieq1u3j?key=a9906978b6d6a493d79b0e831dc532d9', '_blank');
-                }, 200);
-                
-                // Execute callback
-                setTimeout(() => {
-                    if (callback && typeof callback === 'function') {
-                        callback();
-                    }
-                }, 300);
-                
-            } catch (error) {
-                console.log('Ad error:', error);
-                // Execute callback even if ad fails
-                if (callback && typeof callback === 'function') {
-                    setTimeout(callback, 100);
-                }
+        function updateBalanceUI() {
+            document.getElementById('user-points').innerText = currentPoints;
+            document.getElementById('wallet-balance').innerText = currentPoints;
+        }
+
+        // --- TAB SWITCHING ---
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+
+            const navItems = document.querySelectorAll('.nav-item');
+            const infoBtn = document.getElementById('infoBtn');
+
+            if(tabName === 'home') {
+                navItems[0].classList.add('active');
+                document.getElementById('home-page').classList.add('active');
+                document.getElementById('page-title').innerText = "Home";
+                infoBtn.style.display = 'none';
+            }
+            else if(tabName === 'buy') {
+                navItems[1].classList.add('active');
+                document.getElementById('buy-page').classList.add('active');
+                document.getElementById('page-title').innerText = "Buy Services";
+                infoBtn.style.display = 'flex';
+            }
+            else if(tabName === 'wallet') {
+                navItems[2].classList.add('active');
+                document.getElementById('wallet-page').classList.add('active');
+                document.getElementById('page-title').innerText = "Wallet";
+                infoBtn.style.display = 'flex';
             }
         }
-        
-        function showAdAndThenNav(page, el) {
-            showAdAndThen(() => navTo(page, el));
-        }
-        
-        // ==================== TOAST NOTIFICATION ====================
-        function showToast(message, type = 'warning') {
-            const toastContainer = document.getElementById('toast-container');
+
+        // --- GAME LOGIC ---
+        function generateGameData() {
+            // Generate Random Values
+            const randFirst = firstNames[Math.floor(Math.random() * firstNames.length)];
+            const randLast = lastNames[Math.floor(Math.random() * lastNames.length)];
+            targetName = `${randFirst} ${randLast}`;
+            targetVillage = fakeVillages[Math.floor(Math.random() * fakeVillages.length)];
             
-            // Remove existing toast
-            toastContainer.innerHTML = '';
-            
-            // Create new toast
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.style.background = type === 'warning' ? 'rgba(243, 156, 18, 0.9)' : 
-                                    type === 'success' ? 'rgba(46, 204, 113, 0.9)' : 
-                                    'rgba(255, 71, 87, 0.9)';
-            
-            toast.innerHTML = `
-                <i class="fas ${type === 'warning' ? 'fa-exclamation-triangle' : 
-                                type === 'success' ? 'fa-check-circle' : 
-                                'fa-times-circle'}"></i>
-                ${message}
-            `;
-            
-            toastContainer.appendChild(toast);
-            
-            // Remove toast after 3 seconds
-            setTimeout(() => {
-                toast.style.animation = 'slideDown 0.3s ease reverse';
-                setTimeout(() => {
-                    if (toast.parentNode) {
-                        toast.parentNode.removeChild(toast);
-                    }
-                }, 300);
-            }, 3000);
-        }
-        
-        // ==================== INITIALIZATION ====================
-        function init() {
-            console.log("Initializing CodeVille app with Firebase...");
-            
-            // Check for existing user in localStorage
-            const savedUserId = localStorage.getItem('currentUserId');
-            
-            if (savedUserId) {
-                // Load user from Firebase
-                usersRef.child(savedUserId).once('value')
-                    .then(snapshot => {
-                        if (snapshot.exists()) {
-                            currentUser = snapshot.val();
-                            currentUserId = savedUserId;
-                            console.log("User loaded from Firebase:", currentUser.name);
-                            showApp();
-                            
-                            // Listen for real-time updates
-                            usersRef.child(currentUserId).on('value', (snap) => {
-                                if (snap.exists()) {
-                                    currentUser = snap.val();
-                                    updateUI();
-                                }
-                            });
-                        } else {
-                            showRegister();
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error loading user:", error);
-                        showRegister();
-                    });
-            } else {
-                showRegister();
-            }
-            
-            // Load products
-            productsRef.on('value', (snapshot) => {
-                products = snapshot.val() || [];
-                updateMarket();
-            });
-            
-            // Load gift codes
-            giftCodesRef.on('value', (snapshot) => {
-                giftCodes = snapshot.val() || [];
-            });
-            
-            // Load settings
-            settingsRef.on('value', (snapshot) => {
-                appSettings = snapshot.val() || {};
-            });
-        }
-        
-        // Initialize when page loads
-        window.addEventListener('DOMContentLoaded', init);
-        
-        // ==================== INSTRUCTIONS POPUP ====================
-        function showInstructionsPopup() {
-            document.getElementById('instructions-popup').classList.remove('hidden');
-        }
-        
-        function closeInstructionsPopup() {
-            document.getElementById('instructions-popup').classList.add('hidden');
-        }
-        
-        // ==================== CAPTCHA LOCK SYSTEM ====================
-        function initializeCaptchaLock() {
-            if (!currentUser) return;
-            
-            // Initialize captcha stats if not exists
-            if (!currentUser.captchaStats) {
-                currentUser.captchaStats = {
-                    attemptsToday: 0,
-                    lastAttemptDate: null,
-                    lockUntil: null
-                };
-                updateUserInFirebase();
-            }
-            
-            // Check if it's a new day
-            const today = new Date().toDateString();
-            if (currentUser.captchaStats.lastAttemptDate !== today) {
-                currentUser.captchaStats.attemptsToday = 0;
-                currentUser.captchaStats.lastAttemptDate = today;
-                currentUser.captchaStats.lockUntil = null;
-                updateUserInFirebase();
-            }
-            
+            const randLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // A-Z
+            const randNum = Math.floor(1000 + Math.random() * 9000);
+            targetCode = `${randLetter}${randNum}`;
+
             // Update UI
-            updateCaptchaLockUI();
-            
-            // Start timer if locked
-            if (currentUser.captchaStats.lockUntil && Date.now() < currentUser.captchaStats.lockUntil) {
-                startLockTimer();
-            }
-        }
-        
-        function updateCaptchaLockUI() {
-            if (!currentUser || !currentUser.captchaStats) return;
-            
-            const attemptsLeft = CAPTCHA_DAILY_LIMIT - currentUser.captchaStats.attemptsToday;
-            document.getElementById('captcha-attempts-left').textContent = attemptsLeft;
-            
-            const captchaMenuItem = document.getElementById('captcha-menu-item');
-            const lockBadge = document.getElementById('captcha-lock-badge');
-            const limitStatus = document.getElementById('captcha-limit-status');
-            
-            if (currentUser.captchaStats.lockUntil && Date.now() < currentUser.captchaStats.lockUntil) {
-                // Game is locked
-                captchaMenuItem.classList.add('locked');
-                lockBadge.classList.remove('hidden');
-                
-                const remainingTime = Math.ceil((currentUser.captchaStats.lockUntil - Date.now()) / 1000 / 60);
-                limitStatus.innerHTML = `<i class="fas fa-lock"></i> Locked for ${remainingTime} minutes`;
-                limitStatus.style.color = 'var(--warning)';
-            } else {
-                // Game is available
-                captchaMenuItem.classList.remove('locked');
-                lockBadge.classList.add('hidden');
-                
-                if (attemptsLeft <= 0) {
-                    limitStatus.innerHTML = `<i class="fas fa-ban"></i> Daily limit reached (3 hour lock)`;
-                    limitStatus.style.color = 'var(--danger)';
-                } else {
-                    limitStatus.innerHTML = `<i class="fas fa-clock"></i> ${attemptsLeft}/8 attempts left`;
-                    limitStatus.style.color = 'var(--warning)';
-                }
-            }
-        }
-        
-        function checkCaptchaLockWithAd() {
-            if (!currentUser) {
-                showRegister();
-                return;
-            }
-            
-            console.log("Checking captcha lock...");
-            
-            // Show ad first
-            showAdAndThen(() => {
-                initializeCaptchaLock();
-                
-                if (currentUser.captchaStats.attemptsToday >= CAPTCHA_DAILY_LIMIT) {
-                    // Lock for 3 hours
-                    currentUser.captchaStats.lockUntil = Date.now() + CAPTCHA_LOCK_DURATION;
-                    updateUserInFirebase();
-                    
-                    // Redirect to home and show toast
-                    navTo('home', document.querySelector('.nav-item:nth-child(1)'));
-                    showToast('Captcha limit reached! Please wait 3 hours.', 'warning');
-                    return;
-                }
-                
-                if (currentUser.captchaStats.lockUntil && Date.now() < currentUser.captchaStats.lockUntil) {
-                    // Redirect to home and show toast
-                    navTo('home', document.querySelector('.nav-item:nth-child(1)'));
-                    
-                    const remainingTime = Math.ceil((currentUser.captchaStats.lockUntil - Date.now()) / 1000 / 60);
-                    showToast(`Captcha is locked! Please wait ${remainingTime} minutes.`, 'warning');
-                    return;
-                }
-                
-                // Open captcha game
-                openGamePage('captcha');
-            });
-        }
-        
-        function incrementCaptchaAttempts() {
-            if (!currentUser) return;
-            
-            initializeCaptchaLock();
-            
-            // Update attempts
-            currentUser.captchaStats.attemptsToday++;
-            currentUser.captchaStats.lastAttemptDate = new Date().toDateString();
-            
-            // Check if limit reached (8 attempts)
-            if (currentUser.captchaStats.attemptsToday >= CAPTCHA_DAILY_LIMIT) {
-                currentUser.captchaStats.lockUntil = Date.now() + CAPTCHA_LOCK_DURATION;
-                // Auto redirect to home
-                setTimeout(() => {
-                    navTo('home', document.querySelector('.nav-item:nth-child(1)'));
-                    showToast('8 captcha attempts completed! Locked for 3 hours.', 'warning');
-                }, 1500);
-            }
-            
-            updateUserInFirebase();
-            updateCaptchaLockUI();
-        }
-        
-        function startLockTimer() {
-            if (!currentUser || !currentUser.captchaStats.lockUntil) return;
-            
-            updateLockTimer();
-            captchaTimerInterval = setInterval(updateLockTimer, 1000);
-        }
-        
-        function updateLockTimer() {
-            if (!currentUser || !currentUser.captchaStats.lockUntil) {
-                if (captchaTimerInterval) {
-                    clearInterval(captchaTimerInterval);
-                }
-                return;
-            }
-            
-            const remaining = currentUser.captchaStats.lockUntil - Date.now();
-            
-            if (remaining <= 0) {
-                // Lock expired
-                currentUser.captchaStats.lockUntil = null;
-                currentUser.captchaStats.attemptsToday = 0;
-                updateUserInFirebase();
-                updateCaptchaLockUI();
-                
-                if (captchaTimerInterval) {
-                    clearInterval(captchaTimerInterval);
-                }
-                return;
-            }
-        }
-        
-        // ==================== REGISTER FUNCTIONS ====================
-        function showRegister() {
-            document.getElementById('register-screen').classList.remove('hidden');
-            document.getElementById('app-screen').classList.add('hidden');
-        }
-        
-        function generateUID() {
-            return Math.floor(100000 + Math.random() * 900000).toString();
-        }
-        
-        function register() {
-            const phone = document.getElementById('reg-phone').value.trim();
-            const name = document.getElementById('reg-name').value.trim();
-            const password = document.getElementById('reg-pass').value;
-            const rePassword = document.getElementById('reg-repass').value;
-            
-            if (!phone || !name || !password || !rePassword) {
-                alert("Please fill all fields.");
-                return;
-            }
-            
-            if (phone.length < 10) {
-                alert("Enter a valid phone number (10 digits).");
-                return;
-            }
-            
-            if (password.length < 6) {
-                alert("Password must be at least 6 characters.");
-                return;
-            }
-            
-            if (password !== rePassword) {
-                alert("Passwords do not match.");
-                return;
-            }
-            
-            // Check if user already exists
-            usersRef.orderByChild('phone').equalTo(phone).once('value')
-                .then(snapshot => {
-                    if (snapshot.exists()) {
-                        alert("User already registered with this phone.");
-                        return;
-                    }
-                    
-                    // Create new user
-                    const newUser = {
-                        uid: generateUID(),
-                        phone: phone,
-                        name: name,
-                        password: password,
-                        coins: 0,
-                        isNew: true, // For 50 coins gift popup
-                        claimedCodes: [],
-                        captchaStats: {
-                            attemptsToday: 0,
-                            lastAttemptDate: new Date().toDateString(),
-                            lockUntil: null
-                        },
-                        history: {
-                            redeem: [],
-                            transaction: [],
-                            bet: [],
-                            buy: [],
-                            gift: []
-                        },
-                        createdAt: new Date().toLocaleString(),
-                        lastLogin: new Date().toLocaleString()
-                    };
-                    
-                    // Generate a unique ID for the user
-                    const newUserId = 'user_' + Date.now();
-                    
-                    // Save to Firebase
-                    usersRef.child(newUserId).set(newUser)
-                        .then(() => {
-                            currentUser = newUser;
-                            currentUserId = newUserId;
-                            localStorage.setItem('currentUserId', newUserId);
-                            
-                            console.log("New user registered:", newUser.name);
-                            showApp();
-                            
-                            // Listen for real-time updates
-                            usersRef.child(currentUserId).on('value', (snap) => {
-                                if (snap.exists()) {
-                                    currentUser = snap.val();
-                                    updateUI();
-                                }
-                            });
-                        })
-                        .catch(error => {
-                            console.error("Error saving user:", error);
-                            alert("Error creating account. Please try again.");
-                        });
-                })
-                .catch(error => {
-                    console.error("Error checking user:", error);
-                    alert("Error checking user. Please try again.");
-                });
-        }
-        
-        // ==================== FIREBASE USER FUNCTIONS ====================
-        function updateUserInFirebase() {
-            if (!currentUser || !currentUserId) return;
-            
-            // Update last login time
-            currentUser.lastLogin = new Date().toLocaleString();
-            
-            usersRef.child(currentUserId).update(currentUser)
-                .then(() => {
-                    console.log("User updated in Firebase");
-                })
-                .catch(error => {
-                    console.error("Error updating user:", error);
-                });
-        }
-        
-        function updateUserField(field, value) {
-            if (!currentUser || !currentUserId) return;
-            
-            const updateData = {};
-            updateData[field] = value;
-            
-            usersRef.child(currentUserId).update(updateData)
-                .then(() => {
-                    console.log(`User field ${field} updated`);
-                })
-                .catch(error => {
-                    console.error("Error updating user field:", error);
-                });
-        }
-        
-        // ==================== UI FUNCTIONS ====================
-        function showApp() {
-            document.getElementById('register-screen').classList.add('hidden');
-            document.getElementById('app-screen').classList.remove('hidden');
-            updateUI();
-            
-            // Show 50 coins gift popup ONLY for NEW registered users
-            if (currentUser && currentUser.isNew === true) {
-                document.getElementById('gift-username').innerText = currentUser.name.split(' ')[0];
-                document.getElementById('gift-popup').classList.remove('hidden');
-                
-                // Reset isNew flag so it doesn't show again
-                currentUser.isNew = false;
-                updateUserInFirebase();
-            }
-            
-            // Initialize games and lock system
-            generateCaptchaData();
-            initializeCaptchaLock();
-            
-            // Show home page by default
-            navTo('home', document.querySelector('.nav-item:nth-child(1)'));
-        }
-        
-        function updateUI() {
-            if (!currentUser) return;
-            
-            // Update coin displays
-            document.getElementById('top-coin-amount').textContent = currentUser.coins;
-            document.getElementById('redeem-balance').textContent = currentUser.coins;
-            document.getElementById('acc-coins').textContent = currentUser.coins;
-            document.getElementById('acc-username').textContent = currentUser.name;
-            document.getElementById('acc-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
-            document.getElementById('acc-phone').textContent = "+91 " + currentUser.phone;
-            document.getElementById('acc-uid').textContent = currentUser.uid;
-            
-            // Update game coin displays
-            document.getElementById('tictactoe-coins-display').textContent = currentUser.coins;
-            document.getElementById('captcha-coins-display').textContent = currentUser.coins;
-        }
-        
-        function updateMarket() {
-            const marketList = document.getElementById('market-list');
-            if (!marketList) return;
-            
-            if (products.length === 0) {
-                marketList.innerHTML = `
-                    <div class="market-empty">
-                        <div class="market-empty-icon">🛒</div>
-                        <h3>No Products Available</h3>
-                        <p>Products will be added soon by admin</p>
-                    </div>`;
-            } else {
-                let html = '';
-                products.forEach(product => {
-                    html += `
-                        <div class="game-menu-item" onclick="showAdAndThen(() => purchaseProduct('${product.id}'))">
-                            <div class="game-menu-icon">
-                                <i class="fas fa-shopping-bag"></i>
-                            </div>
-                            <div class="game-menu-details">
-                                <h3>${product.name}</h3>
-                                <p>${product.description}</p>
-                                <p style="color: var(--success); font-size: 12px;">Price: ${product.price} Coins</p>
-                            </div>
-                            <div class="game-menu-arrow">›</div>
-                        </div>`;
-                });
-                marketList.innerHTML = html;
-            }
-        }
-        
-        function navTo(page, el) {
-            // Hide all pages
-            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('.full-screen.sub-page').forEach(p => p.classList.add('hidden'));
-            
-            // Remove active class from all nav items
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            
-            // Show selected page and set active nav
-            const pageElement = document.getElementById('page-' + page);
-            if (pageElement) {
-                pageElement.classList.remove('hidden');
-                if (el) el.classList.add('active');
-            }
-            
-            updateUI();
-            
-            // Update captcha lock status
-            if (page === 'home') {
-                updateCaptchaLockUI();
-            }
-        }
-        
-        function closePopup(id) {
-            document.getElementById(id).classList.add('hidden');
-        }
-        
-        // ==================== GAME NAVIGATION ====================
-        function openGamePage(game) {
-            // Hide all pages
-            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('.full-screen.sub-page').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            
-            if (game === 'tictactoe') {
-                document.getElementById('page-tictactoe').classList.remove('hidden');
-                initTicTacToe();
-            } else if (game === 'captcha') {
-                document.getElementById('page-captcha').classList.remove('hidden');
-                generateCaptchaData();
-            }
-        }
-        
-        function backToHome() {
-            showAdAndThen(backToHomeWithoutAd);
-        }
-        
-        function backToHomeWithoutAd() {
-            // Hide all sub pages
-            document.querySelectorAll('.full-screen.sub-page').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            
-            // Show home page
-            document.getElementById('page-home').classList.remove('hidden');
-            const homeNav = document.querySelector('.nav-item:nth-child(1)');
-            if (homeNav) homeNav.classList.add('active');
-            
-            updateUI();
-            updateCaptchaLockUI();
-        }
-        
-        // ==================== WELCOME GIFT ====================
-        function claimWelcomeGift() {
-            if (!currentUser) return;
-            
-            currentUser.coins += 50;
-            
-            logTransaction("Welcome Bonus", "+50", "Win");
-            
-            updateUserInFirebase();
-            closePopup('gift-popup');
-            updateUI();
-            
-            showToast('50 Coins added to your account!', 'success');
-        }
-        
-        // ==================== TIC TAC TOE GAME ====================
-        function initTicTacToe() {
-            // Reset board
-            boardState = ["", "", "", "", "", "", "", "", ""];
-            ticTacToeGameActive = true;
-            ticTacToeCurrentPlayer = "X";
-            
-            // Clear cells
-            const cells = document.querySelectorAll('.cell');
-            cells.forEach(cell => {
-                cell.textContent = "";
-                cell.classList.remove('x', 'o');
-                cell.onclick = handleCellClick;
-            });
-            
-            // Set difficulty
-            const difficultySelect = document.getElementById('difficulty');
-            aiDifficulty = parseFloat(difficultySelect.value);
-            difficultySelect.onchange = (e) => {
-                aiDifficulty = parseFloat(e.target.value);
-            };
-            
-            document.getElementById('status').textContent = "Your Turn (X)";
-        }
-        
-        function handleCellClick(e) {
-            const cell = e.target;
-            const index = parseInt(cell.getAttribute('data-index'));
-            
-            if (boardState[index] !== "" || !ticTacToeGameActive || ticTacToeCurrentPlayer !== "X") {
-                return;
-            }
-            
-            // Player move
-            makeMove(index, "X");
-            cell.classList.add('x');
-            
-            if (checkWin("X")) {
-                endTicTacToeGame(true);
-            } else if (isTicTacToeDraw()) {
-                document.getElementById('status').textContent = "It's a Draw!";
-                ticTacToeGameActive = false;
-            } else {
-                // AI move
-                ticTacToeCurrentPlayer = aiPlayer;
-                document.getElementById('status').textContent = "AI is thinking...";
-                setTimeout(aiMove, 500);
-            }
-        }
-        
-        function makeMove(index, player) {
-            boardState[index] = player;
-            const cell = document.querySelector(`.cell[data-index="${index}"]`);
-            cell.textContent = player;
-        }
-        
-        function aiMove() {
-            if (!ticTacToeGameActive) return;
-            
-            let bestScore = -Infinity;
-            let move;
-            const difficulty = Math.random();
-            
-            if (difficulty > aiDifficulty) {
-                // Random move
-                let availableMoves = [];
-                for (let i = 0; i < 9; i++) {
-                    if (boardState[i] === "") availableMoves.push(i);
-                }
-                move = availableMoves[Math.floor(Math.random() * availableMoves.length)];
-            } else {
-                // Smart move
-                for (let i = 0; i < 9; i++) {
-                    if (boardState[i] === "") {
-                        boardState[i] = aiPlayer;
-                        let score = minimax(boardState, 0, false);
-                        boardState[i] = "";
-                        if (score > bestScore) {
-                            bestScore = score;
-                            move = i;
-                        }
-                    }
-                }
-            }
-            
-            makeMove(move, aiPlayer);
-            document.querySelector(`.cell[data-index="${move}"]`).classList.add('o');
-            
-            if (checkWin(aiPlayer)) {
-                document.getElementById('status').textContent = "AI Won!";
-                setTimeout(() => {
-                    document.getElementById('losePanel').classList.add('active');
-                }, 500);
-                ticTacToeGameActive = false;
-                logBetHistory("Tic Tac Toe", "Lose", "-", "AI Won");
-            } else if (isTicTacToeDraw()) {
-                document.getElementById('status').textContent = "It's a Draw!";
-                ticTacToeGameActive = false;
-                logBetHistory("Tic Tac Toe", "Draw", "-", "Game Draw");
-            } else {
-                ticTacToeCurrentPlayer = "X";
-                document.getElementById('status').textContent = "Your Turn (X)";
-            }
-        }
-        
-        function minimax(board, depth, isMaximizing) {
-            if (checkWin(aiPlayer)) return 10 - depth;
-            if (checkWin("X")) return depth - 10;
-            if (isTicTacToeDraw()) return 0;
-            
-            if (isMaximizing) {
-                let bestScore = -Infinity;
-                for (let i = 0; i < 9; i++) {
-                    if (board[i] === "") {
-                        board[i] = aiPlayer;
-                        let score = minimax(board, depth + 1, false);
-                        board[i] = "";
-                        bestScore = Math.max(score, bestScore);
-                    }
-                }
-                return bestScore;
-            } else {
-                let bestScore = Infinity;
-                for (let i = 0; i < 9; i++) {
-                    if (board[i] === "") {
-                        board[i] = "X";
-                        let score = minimax(board, depth + 1, true);
-                        board[i] = "";
-                        bestScore = Math.min(score, bestScore);
-                    }
-                }
-                return bestScore;
-            }
-        }
-        
-        function checkWin(player) {
-            const winConditions = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
-                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
-                [0, 4, 8], [2, 4, 6] // diagonals
-            ];
-            
-            return winConditions.some(combination => {
-                return combination.every(index => {
-                    return boardState[index] === player;
-                });
-            });
-        }
-        
-        function isTicTacToeDraw() {
-            return boardState.every(cell => cell !== "");
-        }
-        
-        function endTicTacToeGame(userWon) {
-            ticTacToeGameActive = false;
-            if (userWon) {
-                document.getElementById('status').textContent = "YOU WON!";
-                setTimeout(() => {
-                    document.getElementById('winPanel').classList.add('active');
-                }, 500);
-            }
-        }
-        
-        function collectTicTacToeCoins() {
-            if (!currentUser) return;
-            
-            currentUser.coins += 25;
-            logTransaction("Tic Tac Toe Win", "+25", "Win");
-            logBetHistory("Tic Tac Toe", "Win", "+25", "Game Won");
-            
-            updateUserInFirebase();
-            document.getElementById('winPanel').classList.remove('active');
-            updateUI();
-            
-            showToast('25 Coins added to your account!', 'success');
+            const box = document.getElementById('target-data-box');
+            box.classList.add('data-changing');
             
             setTimeout(() => {
-                resetTicTacToe();
+                document.getElementById('target-name').innerText = targetName;
+                document.getElementById('target-village').innerText = targetVillage;
+                document.getElementById('target-code').innerText = targetCode;
+                box.classList.remove('data-changing');
             }, 300);
+
+            // Clear inputs
+            document.getElementById('game-name').value = '';
+            document.getElementById('game-village').value = '';
+            document.getElementById('game-code').value = '';
         }
-        
-        function closeLosePanel() {
-            document.getElementById('losePanel').classList.remove('active');
-            resetTicTacToe();
-        }
-        
-        function resetTicTacToe() {
-            initTicTacToe();
-        }
-        
-        // ==================== CAPTCHA GAME ====================
-        function generateCaptchaData() {
-            const randomFirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-            const randomLastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-            captchaTargetName = `${randomFirstName} ${randomLastName}`;
-            
-            captchaTargetVillage = fakeVillages[Math.floor(Math.random() * fakeVillages.length)];
-            
-            const randomLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
-            const randomNumber = Math.floor(1000 + Math.random() * 9000);
-            captchaTargetCode = `${randomLetter}${randomNumber}`;
-            
-            // Update display
-            document.getElementById('captcha-target-name').textContent = captchaTargetName;
-            document.getElementById('captcha-target-village').textContent = captchaTargetVillage;
-            document.getElementById('captcha-target-code').textContent = captchaTargetCode;
-            
-            // Clear input fields
-            document.getElementById('captcha-name').value = '';
-            document.getElementById('captcha-village').value = '';
-            document.getElementById('captcha-code').value = '';
-        }
-        
-        function checkCaptchaMatch() {
-            const name = document.getElementById('captcha-name').value.trim();
-            const village = document.getElementById('captcha-village').value.trim();
-            const code = document.getElementById('captcha-code').value.trim();
-            
-            // Update display in modal
-            document.getElementById('captcha-user-name-display').textContent = name || "(empty)";
-            document.getElementById('captcha-user-village-display').textContent = village || "(empty)";
-            document.getElementById('captcha-user-code-display').textContent = code || "(empty)";
-            
-            document.getElementById('captcha-target-name-display').textContent = captchaTargetName;
-            document.getElementById('captcha-target-village-display').textContent = captchaTargetVillage;
-            document.getElementById('captcha-target-code-display').textContent = captchaTargetCode;
-            
-            // Check matches
-            const nameMatch = name === captchaTargetName;
-            const villageMatch = village === captchaTargetVillage;
-            const codeMatch = code === captchaTargetCode;
-            const allMatch = nameMatch && villageMatch && codeMatch;
-            
-            // Update match indicators
-            document.getElementById('captcha-name-match').textContent = nameMatch ? "✓" : "✗";
-            document.getElementById('captcha-name-match').className = nameMatch ? "captcha-match-yes" : "captcha-match-no";
-            
-            document.getElementById('captcha-village-match').textContent = villageMatch ? "✓" : "✗";
-            document.getElementById('captcha-village-match').className = villageMatch ? "captcha-match-yes" : "captcha-match-no";
-            
-            document.getElementById('captcha-code-match').textContent = codeMatch ? "✓" : "✗";
-            document.getElementById('captcha-code-match').className = codeMatch ? "captcha-match-yes" : "captcha-match-no";
-            
-            // Show appropriate result
-            if (allMatch) {
-                document.getElementById('captcha-result-status').textContent = 'Perfect Match! All entries are correct!';
-                document.getElementById('captcha-result-status').className = 'captcha-success';
-                document.getElementById('captcha-coins-text').innerHTML = 'You earned 25 coins!';
-                document.getElementById('captcha-claim-btn').style.display = 'flex';
-                document.getElementById('captcha-new-data-btn').style.display = 'none';
+
+        function checkGameResult() {
+            const inName = document.getElementById('game-name').value.trim();
+            const inVillage = document.getElementById('game-village').value.trim();
+            const inCode = document.getElementById('game-code').value.trim();
+
+            const isNameMatch = inName === targetName;
+            const isVillageMatch = inVillage === targetVillage;
+            const isCodeMatch = inCode === targetCode;
+            const isWin = isNameMatch && isVillageMatch && isCodeMatch;
+
+            // Fill Modal Details
+            document.getElementById('res-name-match').innerHTML = isNameMatch ? '<i class="fas fa-check-circle match-yes"></i>' : '<i class="fas fa-times-circle match-no"></i>';
+            document.getElementById('res-village-match').innerHTML = isVillageMatch ? '<i class="fas fa-check-circle match-yes"></i>' : '<i class="fas fa-times-circle match-no"></i>';
+            document.getElementById('res-code-match').innerHTML = isCodeMatch ? '<i class="fas fa-check-circle match-yes"></i>' : '<i class="fas fa-times-circle match-no"></i>';
+
+            const statusMsg = document.getElementById('game-status-msg');
+            const winArea = document.getElementById('win-area');
+            const loseArea = document.getElementById('lose-area');
+
+            if(isWin) {
+                statusMsg.innerHTML = '<i class="fas fa-trophy"></i> PERFECT MATCH!';
+                statusMsg.className = "result-status success";
+                winArea.style.display = "block";
+                loseArea.style.display = "none";
             } else {
-                document.getElementById('captcha-result-status').textContent = 'Entries do not match';
-                document.getElementById('captcha-result-status').className = 'captcha-error';
-                document.getElementById('captcha-coins-text').innerHTML = 'No coins earned this time';
-                document.getElementById('captcha-claim-btn').style.display = 'none';
-                document.getElementById('captcha-new-data-btn').style.display = 'flex';
+                statusMsg.innerHTML = '<i class="fas fa-times-octagon"></i> Mismatch Found';
+                statusMsg.className = "result-status error";
+                winArea.style.display = "none";
+                loseArea.style.display = "block";
             }
-            
-            // Show modal
-            document.getElementById('captcha-modal-overlay').style.display = 'flex';
+
+            document.getElementById('gameResultModal').style.display = 'flex';
         }
-        
-        function closeCaptchaModal() {
-            document.getElementById('captcha-modal-overlay').style.display = 'none';
-            generateCaptchaData();
-            updateCaptchaLockUI();
+
+        function claimReward() {
+            currentPoints += 25;
+            updateBalanceUI();
+            document.getElementById('gameResultModal').style.display = 'none';
+            generateGameData(); // Start new round
         }
-        
-        function claimCaptchaCoins() {
-            if (!currentUser) return;
-            
-            // Check if user can play more captcha
-            if (currentUser.captchaStats.attemptsToday >= CAPTCHA_DAILY_LIMIT) {
-                showToast("Daily limit reached! Please wait for 3 hours.", 'warning');
-                closeCaptchaModal();
-                navTo('home', document.querySelector('.nav-item:nth-child(1)'));
-                return;
-            }
-            
-            // Increment attempts
-            incrementCaptchaAttempts();
-            
-            // Add coins
-            currentUser.coins += 25;
-            logTransaction("Captcha Game Win", "+25", "Win");
-            logBetHistory("Captcha", "Win", "+25", "Correct Entry");
-            
-            updateUserInFirebase();
-            
-            // Update modal message
-            document.getElementById('captcha-result-status').textContent = 'Congratulations!';
-            document.getElementById('captcha-result-status').className = 'captcha-success';
-            document.getElementById('captcha-coins-text').innerHTML = '25 coins added to your balance!';
-            document.getElementById('captcha-claim-btn').style.display = 'none';
-            document.getElementById('captcha-new-data-btn').style.display = 'flex';
-            
-            // Update UI
-            updateUI();
-            
-            // Close modal and generate new data after 1.5 seconds
-            setTimeout(() => {
-                closeCaptchaModal();
-                
-                // Check if limit reached
-                if (currentUser.captchaStats.attemptsToday >= CAPTCHA_DAILY_LIMIT) {
-                    showToast("8 captcha attempts completed! Locked for 3 hours.", 'warning');
-                    navTo('home', document.querySelector('.nav-item:nth-child(1)'));
-                }
-            }, 1500);
+
+        function resetGame() {
+            document.getElementById('gameResultModal').style.display = 'none';
+            generateGameData(); // Start new round
         }
-        
-        // ==================== REDEEM FUNCTIONS ====================
-        function processRedeem() {
-            const name = document.getElementById('redeem-name').value.trim();
-            const amountVal = document.getElementById('redeem-amount').value.trim();
-            const amount = parseInt(amountVal);
+
+        // --- BUY PAGE LOGIC ---
+        const serviceSelect = document.getElementById('service-select');
+        serviceSelect.addEventListener('change', function() {
+            const opt = this.options[this.selectedIndex];
+            const cost = opt.getAttribute('data-cost');
+            const qty = opt.getAttribute('data-qty');
+            const text = opt.text.replace(/[\d\W_]+/g, ' ').trim(); 
+            document.getElementById('rate-display').innerText = `${cost} points = ${qty} actions`;
+        });
+
+        function createCampaign() {
+            const link = document.getElementById('campaign-link').value;
+            const opt = serviceSelect.options[serviceSelect.selectedIndex];
+            const cost = parseInt(opt.getAttribute('data-cost'));
             
-            if (!name || !amountVal) {
-                alert("Please fill all details.");
-                return;
-            }
+            if(!link) return alert("Please enter link");
             
-            if (isNaN(amount) || amount < 1200) {
-                alert("Minimum redeem amount is 1200 coins (₹10).");
-                return;
-            }
-            
-            if (amount > currentUser.coins) {
-                alert("Insufficient coin balance.");
-                return;
-            }
-            
-            currentUser.coins -= amount;
-            const transId = "TXN" + Date.now().toString().substring(5);
-            
-            // Add to redeem history with SUCCESS status
-            currentUser.history.redeem.unshift({
-                amount: amount,
-                tid: transId,
-                date: new Date().toLocaleString(),
-                status: "Success"
-            });
-            
-            logTransaction("Withdrawal Request", `-${amount}`, "Invest");
-            
-            updateUserInFirebase();
-            
-            // Also save to admin data for tracking
-            adminDataRef.child('redeemRequests').push({
-                userId: currentUserId,
-                userName: currentUser.name,
-                userPhone: currentUser.phone,
-                amount: amount,
-                transactionId: transId,
-                date: new Date().toLocaleString(),
-                status: "Pending",
-                accountName: name
-            });
-            
-            // Show success message
-            alert(`✅ Redeem request for ${amount} Coins successful!\n\nTransaction ID: ${transId}\n1200 Coins = ₹10\n\nYour request will be processed within 24 hours.`);
-            
-            document.getElementById('redeem-amount').value = "";
-            document.getElementById('redeem-name').value = "";
-            updateUI();
-        }
-        
-        // ==================== HISTORY FUNCTIONS ====================
-        function openSubPage(id) {
-            renderHistory(id);
-            document.getElementById(id).classList.remove('hidden');
-        }
-        
-        function closeSubPage(id) {
-            document.getElementById(id).classList.add('hidden');
-        }
-        
-        function renderHistory(pageId) {
-            let container, data, html = "";
-            
-            if (!currentUser) return;
-            
-            if (pageId === 'sub-redeem-hist') {
-                container = document.getElementById('list-redeem-hist');
-                data = currentUser.history.redeem || [];
-                data.forEach(d => {
-                    // Always show as Success
-                    let statusClass = "text-green";
-                    let statusText = "Success";
-                    
-                    html += `
-                        <div class="history-item">
-                            <div><b>Transaction ID: ${d.tid}</b><br><small>${d.date}</small><br><small class="${statusClass}">${statusText}</small></div>
-                            <div style="text-align:right"><span class="text-red" style="font-weight:bold">-${d.amount} C</span></div>
-                        </div>`;
-                });
-            } else if (pageId === 'sub-trans-hist') {
-                container = document.getElementById('list-trans-hist');
-                data = currentUser.history.transaction || [];
-                data.forEach(d => {
-                    const color = d.amount.includes('-') ? 'text-red' : 'text-green';
-                    html += `
-                        <div class="history-item">
-                            <div><b>${d.desc}</b><br><small>${d.date}</small></div>
-                            <div class="${color}" style="font-weight:bold; font-size:18px;">${d.amount} C</div>
-                        </div>`;
-                });
-            } else if (pageId === 'sub-bet-hist') {
-                container = document.getElementById('list-bet-hist');
-                data = currentUser.history.bet || [];
-                data.forEach(d => {
-                    const color = d.result === "Win" ? 'text-green' : (d.result === "Lose" ? 'text-red' : 'text-muted');
-                    html += `
-                        <div class="history-item">
-                            <div><b>${d.game}</b><br><small>${d.description}</small><br><small>${d.date}</small></div>
-                            <div class="${color}" style="font-weight:bold; font-size:18px;">${d.amount} C</div>
-                        </div>`;
-                });
-            } else if (pageId === 'sub-buy-hist') {
-                container = document.getElementById('list-buy-hist');
-                data = currentUser.history.buy || [];
-                if (data.length === 0) {
-                    html = `<p style="text-align:center; padding:30px; color:var(--text-muted);">No purchases yet.</p>`;
-                } else {
-                    data.forEach(d => {
-                        html += `
-                            <div class="history-item">
-                                <div><b>${d.item}</b><br><small>${d.date}</small></div>
-                                <div style="font-weight:bold; color:var(--secondary)">${d.price} C</div>
-                            </div>`;
-                    });
-                }
-            } else if (pageId === 'sub-gift') {
-                container = document.getElementById('list-gift-hist');
-                data = currentUser.history.gift || [];
-                data.forEach(d => {
-                    html += `
-                        <div class="history-item">
-                            <div><b style="letter-spacing:1px">${d.code}</b><br><small>${d.date}</small></div>
-                            <div class="text-green" style="font-weight:bold; font-size:18px;">+${d.amount} C</div>
-                        </div>`;
-                });
-            }
-            
-            if (html === "" && pageId !== 'sub-buy-hist') {
-                html = `<p style="text-align:center; padding:30px; color:var(--text-muted);">No records found.</p>`;
-            }
-            
-            if (container) container.innerHTML = html;
-        }
-        
-        function logTransaction(desc, amount, type) {
-            if (!currentUser.history.transaction) {
-                currentUser.history.transaction = [];
-            }
-            
-            currentUser.history.transaction.unshift({
-                desc: desc,
-                amount: amount,
-                type: type,
-                date: new Date().toLocaleString()
-            });
-            
-            updateUserField('history/transaction', currentUser.history.transaction);
-        }
-        
-        function logBetHistory(game, result, amount, description) {
-            if (!currentUser.history.bet) {
-                currentUser.history.bet = [];
-            }
-            
-            currentUser.history.bet.unshift({
-                game: game,
-                result: result,
-                amount: amount,
-                description: description,
-                date: new Date().toLocaleString()
-            });
-            
-            updateUserField('history/bet', currentUser.history.bet);
-        }
-        
-        // ==================== GIFT CODE FUNCTIONS ====================
-        function redeemGiftCode() {
-            const input = document.getElementById('gift-code-input');
-            const code = input.value.trim().toUpperCase();
-            
-            if (!code) {
-                alert("Please enter a code.");
-                return;
-            }
-            
-            if (!currentUser.claimedCodes) {
-                currentUser.claimedCodes = [];
-            }
-            
-            if (currentUser.claimedCodes.includes(code)) {
-                alert("You have already claimed this code!");
-                return;
-            }
-            
-            // Check if code exists
-            const validCode = giftCodes.find(c => c.code === code && (!c.limit || c.claimedCount < c.limit));
-            
-            if (validCode) {
-                // Add coins
-                currentUser.coins += validCode.amount;
-                currentUser.claimedCodes.push(code);
-                
-                // Add to history
-                if (!currentUser.history.gift) {
-                    currentUser.history.gift = [];
-                }
-                
-                currentUser.history.gift.unshift({
-                    code: code,
-                    amount: validCode.amount,
-                    date: new Date().toLocaleString()
-                });
-                
-                // Update user in Firebase
-                updateUserInFirebase();
-                
-                // Update gift code claimed count
-                const codeIndex = giftCodes.findIndex(c => c.code === code);
-                if (codeIndex !== -1) {
-                    giftCodes[codeIndex].claimedCount = (giftCodes[codeIndex].claimedCount || 0) + 1;
-                    giftCodesRef.set(giftCodes);
-                }
-                
-                logTransaction("Gift Code Redeem", `+${validCode.amount}`, "Win");
-                
-                alert(`Awesome! ${validCode.amount} Coins added to your wallet.`);
-                input.value = "";
-                renderHistory('sub-gift');
-                updateUI();
+            if(currentPoints >= cost) {
+                currentPoints -= cost;
+                updateBalanceUI();
+                alert("Campaign Created Successfully!");
+                document.getElementById('campaign-link').value = "";
             } else {
-                alert("Invalid or expired gift code.");
+                alert("Insufficient Points! Play games to earn more.");
             }
         }
-        
-        // ==================== SETTINGS FUNCTIONS ====================
-        function changeName() {
-            const newName = document.getElementById('set-new-name').value.trim();
-            if (newName) {
-                currentUser.name = newName;
-                updateUserInFirebase();
-                alert("Display name updated successfully!");
-                document.getElementById('set-new-name').value = "";
-                updateUI();
+
+        // --- REDEEM LOGIC ---
+        function calculateInr() {
+            const coins = document.getElementById('redeem-coins').value;
+            const err = document.getElementById('redeem-error');
+            const disp = document.getElementById('inr-display');
+
+            if(coins < 5000) {
+                err.style.display = 'block';
+                disp.innerText = "You will receive: ₹0";
+                disp.style.color = "#c62828";
+                disp.style.backgroundColor = "#ffcdd2";
+                disp.style.borderColor = "#e57373";
             } else {
-                alert("Please enter a valid name.");
+                err.style.display = 'none';
+                disp.innerText = `You will receive: ₹${(coins/1000)*100}`;
+                disp.style.color = "#00695c";
+                disp.style.backgroundColor = "#e0f2f1";
+                disp.style.borderColor = "#b2dfdb";
             }
         }
-        
-        function changePass() {
-            const oldP = document.getElementById('set-old-pass').value;
-            const newP = document.getElementById('set-new-pass').value;
-            const reP = document.getElementById('set-renew-pass').value;
+
+        function redeemPoints() {
+            const coins = parseInt(document.getElementById('redeem-coins').value);
+            const email = document.getElementById('redeem-email').value;
             
-            if (!oldP || !newP || !reP) {
-                alert("Please fill all password fields.");
-                return;
-            }
-            
-            if (oldP !== currentUser.password) {
-                alert("Current password is incorrect.");
-                return;
-            }
-            
-            if (newP !== reP) {
-                alert("New passwords do not match.");
-                return;
-            }
-            
-            if (newP.length < 6) {
-                alert("New password must be at least 6 characters.");
-                return;
-            }
-            
-            currentUser.password = newP;
-            updateUserInFirebase();
-            alert("Password changed successfully!");
-            document.getElementById('set-old-pass').value = "";
-            document.getElementById('set-new-pass').value = "";
-            document.getElementById('set-renew-pass').value = "";
-        }
-        
-        // ==================== PRODUCT PURCHASE ====================
-        function purchaseProduct(productId) {
-            const product = products.find(p => p.id === productId);
-            if (!product) {
-                alert("Product not found!");
-                return;
-            }
-            
-            if (currentUser.coins < product.price) {
-                alert("Insufficient coins to purchase this product!");
-                return;
-            }
-            
-            if (confirm(`Are you sure you want to purchase "${product.name}" for ${product.price} coins?`)) {
-                currentUser.coins -= product.price;
-                
-                // Add to purchase history
-                if (!currentUser.history.buy) {
-                    currentUser.history.buy = [];
-                }
-                
-                currentUser.history.buy.unshift({
-                    item: product.name,
-                    price: product.price,
-                    date: new Date().toLocaleString()
-                });
-                
-                logTransaction(`Purchase: ${product.name}`, `-${product.price}`, "Purchase");
-                
-                updateUserInFirebase();
-                updateUI();
-                
-                alert(`✅ Successfully purchased "${product.name}"!`);
-                showToast(`Purchased ${product.name} for ${product.price} coins`, 'success');
+            if(!coins || coins < 5000) return alert("Minimum 5000 points required");
+            if(!email) return alert("Enter payment email");
+
+            if(currentPoints >= coins) {
+                currentPoints -= coins;
+                updateBalanceUI();
+                alert(`Redemption Request Sent for ₹${(coins/1000)*100}`);
+                document.getElementById('redeem-coins').value = "";
+                calculateInr(); // Reset display
+            } else {
+                alert("Insufficient Balance");
             }
         }
-        
-        // ==================== GAME CELL CLICK HANDLERS ====================
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("DOM fully loaded and parsed");
-            
-            // Make sure all forms don't submit and refresh page
-            document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                });
-            });
+
+        // --- INFO MODAL LOGIC ---
+        document.getElementById('infoBtn').addEventListener('click', () => {
+            document.getElementById('infoModal').style.display = 'flex';
+        });
+
+        // Block copy paste for game
+        document.getElementById('target-data-box').addEventListener('copy', (e) => {
+            e.preventDefault();
+            alert("Copying not allowed! Please type manually.");
         });
     </script>
 </body>
