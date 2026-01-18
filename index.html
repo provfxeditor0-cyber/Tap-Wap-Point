@@ -363,6 +363,18 @@
             font-weight: bold;
         }
         
+        .timer-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--danger);
+            color: white;
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
         .game-menu-icon {
             width: 60px;
             height: 60px;
@@ -962,11 +974,6 @@
             color: white !important;
         }
         
-        .icon-support {
-            background: linear-gradient(135deg, #00BCD4, #00838F) !important;
-            color: white !important;
-        }
-        
         .icon-contact {
             background: linear-gradient(135deg, #0088cc, #005580) !important;
             color: white !important;
@@ -1471,6 +1478,7 @@
                             </div>
                             <div class="game-menu-arrow">›</div>
                             <div id="captcha-lock-badge" class="lock-badge hidden">LOCKED</div>
+                            <div id="captcha-timer-badge" class="timer-badge hidden"></div>
                         </div>
                     </div>
                 </div>
@@ -1599,7 +1607,7 @@
                                 <i class="fas fa-check-circle"></i> Check Match
                             </button>
                             <div style="text-align: center; margin-top: 15px; color: var(--warning); font-size: 14px;">
-                                <i class="fas fa-info-circle"></i> Attempts Left Today: <span id="captcha-attempts-left">8</span>/8
+                                <i class="fas fa-info-circle"></i> Attempts This Session: <span id="captcha-attempts-left">0</span>/8
                             </div>
                         </div>
                     </div>
@@ -1686,18 +1694,18 @@
                     <h2>Withdraw Funds</h2>
                     <div style="background: var(--surface); padding: 20px; border-radius: 16px; margin-bottom: 25px; border: var(--glass-border);">
                         <div style="color: var(--text-muted); font-size: 14px; margin-bottom: 10px;">
-                            <i class="fas fa-info-circle"></i> 1200 Coins = ₹10
+                            <i class="fas fa-info-circle"></i> 6000 Coins = ₹50
                         </div>
                         <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1)">
                              Current Balance: <span id="redeem-balance" class="text-green" style="font-weight:bold">0</span>
                         </div>
                         <div style="margin-top: 10px; color: var(--warning); font-size: 14px;">
-                            <i class="fas fa-info-circle"></i> Minimum Withdrawal: 1200 Coins (₹10)
+                            <i class="fas fa-info-circle"></i> Minimum Withdrawal: 6000 Coins (₹50)
                         </div>
                     </div>
                     
                     <div class="input-group"><div class="input-icon"><i class="fas fa-user"></i></div><input type="text" id="redeem-name" placeholder="Account Name"></div>
-                    <div class="input-group"><div class="input-icon"><i class="fas fa-coins"></i></div><input type="number" id="redeem-amount" placeholder="Coins to Withdraw (Min 1200)" pattern="[0-9]*" inputmode="numeric"></div>
+                    <div class="input-group"><div class="input-icon"><i class="fas fa-coins"></i></div><input type="number" id="redeem-amount" placeholder="Coins to Withdraw (Min 6000)" pattern="[0-9]*" inputmode="numeric"></div>
                     <button onclick="showAdAndThen(processRedeem)">REDEEM NOW</button>
                     
                     <!-- Added Note -->
@@ -1847,11 +1855,11 @@
         
         // Captcha Lock System Variables
         let captchaTimerInterval = null;
-        const CAPTCHA_DAILY_LIMIT = 8;
+        const CAPTCHA_SESSION_LIMIT = 8;
         const CAPTCHA_LOCK_DURATION = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
         
         // ==================== LOCAL STORAGE KEYS ====================
-        const DB_KEY = "codeville_users_v11";
+        const DB_KEY = "codeville_users_v12";
         const PRODUCTS_KEY = "codeville_products";
         const CODES_KEY = "codeville_codes";
         
@@ -2011,25 +2019,23 @@
             document.getElementById('instructions-popup').classList.add('hidden');
         }
         
-        // ==================== CAPTCHA LOCK SYSTEM ====================
+        // ==================== CAPTCHA LOCK SYSTEM (3-HOUR SESSION BASED) ====================
         function initializeCaptchaLock() {
             if (!currentUser) return;
             
             // Initialize captcha stats if not exists
             if (!currentUser.captchaStats) {
                 currentUser.captchaStats = {
-                    attemptsToday: 0,
-                    lastAttemptDate: null,
+                    attemptsThisSession: 0,
                     lockUntil: null
                 };
                 saveUsers();
             }
             
-            // Check if it's a new day
-            const today = new Date().toDateString();
-            if (currentUser.captchaStats.lastAttemptDate !== today) {
-                currentUser.captchaStats.attemptsToday = 0;
-                currentUser.captchaStats.lastAttemptDate = today;
+            // Check if lock has expired
+            if (currentUser.captchaStats.lockUntil && Date.now() >= currentUser.captchaStats.lockUntil) {
+                // Reset session after lock expires
+                currentUser.captchaStats.attemptsThisSession = 0;
                 currentUser.captchaStats.lockUntil = null;
                 saveUsers();
             }
@@ -2046,31 +2052,38 @@
         function updateCaptchaLockUI() {
             if (!currentUser || !currentUser.captchaStats) return;
             
-            const attemptsLeft = CAPTCHA_DAILY_LIMIT - currentUser.captchaStats.attemptsToday;
-            document.getElementById('captcha-attempts-left').textContent = attemptsLeft;
+            const attemptsLeft = CAPTCHA_SESSION_LIMIT - currentUser.captchaStats.attemptsThisSession;
+            document.getElementById('captcha-attempts-left').textContent = currentUser.captchaStats.attemptsThisSession;
             
             const captchaMenuItem = document.getElementById('captcha-menu-item');
             const lockBadge = document.getElementById('captcha-lock-badge');
+            const timerBadge = document.getElementById('captcha-timer-badge');
             const limitStatus = document.getElementById('captcha-limit-status');
             
             if (currentUser.captchaStats.lockUntil && Date.now() < currentUser.captchaStats.lockUntil) {
                 // Game is locked
                 captchaMenuItem.classList.add('locked');
                 lockBadge.classList.remove('hidden');
+                timerBadge.classList.remove('hidden');
                 
                 const remainingTime = Math.ceil((currentUser.captchaStats.lockUntil - Date.now()) / 1000 / 60);
-                limitStatus.innerHTML = `<i class="fas fa-lock"></i> Locked for ${remainingTime} minutes`;
-                limitStatus.style.color = 'var(--warning)';
+                const hours = Math.floor(remainingTime / 60);
+                const minutes = remainingTime % 60;
+                
+                timerBadge.textContent = `${hours}h ${minutes}m`;
+                limitStatus.innerHTML = `<i class="fas fa-lock"></i> Locked for ${hours} hours ${minutes} minutes`;
+                limitStatus.style.color = 'var(--danger)';
             } else {
                 // Game is available
                 captchaMenuItem.classList.remove('locked');
                 lockBadge.classList.add('hidden');
+                timerBadge.classList.add('hidden');
                 
-                if (attemptsLeft <= 0) {
-                    limitStatus.innerHTML = `<i class="fas fa-ban"></i> Daily limit reached (3 hour lock)`;
+                if (currentUser.captchaStats.attemptsThisSession >= CAPTCHA_SESSION_LIMIT) {
+                    limitStatus.innerHTML = `<i class="fas fa-ban"></i> Session limit reached (3 hour lock)`;
                     limitStatus.style.color = 'var(--danger)';
                 } else {
-                    limitStatus.innerHTML = `<i class="fas fa-clock"></i> ${attemptsLeft}/8 attempts left`;
+                    limitStatus.innerHTML = `<i class="fas fa-clock"></i> ${currentUser.captchaStats.attemptsThisSession}/8 attempts this session`;
                     limitStatus.style.color = 'var(--warning)';
                 }
             }
@@ -2088,14 +2101,15 @@
             showAdAndThen(() => {
                 initializeCaptchaLock();
                 
-                if (currentUser.captchaStats.attemptsToday >= CAPTCHA_DAILY_LIMIT) {
+                if (currentUser.captchaStats.attemptsThisSession >= CAPTCHA_SESSION_LIMIT) {
                     // Lock for 3 hours
                     currentUser.captchaStats.lockUntil = Date.now() + CAPTCHA_LOCK_DURATION;
                     saveUsers();
                     
                     // Redirect to home and show toast
                     navTo('home', document.querySelector('.nav-item:nth-child(1)'));
-                    showToast('Captcha limit reached! Please wait 3 hours.', 'warning');
+                    showToast('Captcha session limit reached! Locked for 3 hours.', 'warning');
+                    updateCaptchaLockUI();
                     return;
                 }
                 
@@ -2104,7 +2118,9 @@
                     navTo('home', document.querySelector('.nav-item:nth-child(1)'));
                     
                     const remainingTime = Math.ceil((currentUser.captchaStats.lockUntil - Date.now()) / 1000 / 60);
-                    showToast(`Captcha is locked! Please wait ${remainingTime} minutes.`, 'warning');
+                    const hours = Math.floor(remainingTime / 60);
+                    const minutes = remainingTime % 60;
+                    showToast(`Captcha is locked! Please wait ${hours} hours ${minutes} minutes.`, 'warning');
                     return;
                 }
                 
@@ -2119,11 +2135,10 @@
             initializeCaptchaLock();
             
             // Update attempts
-            currentUser.captchaStats.attemptsToday++;
-            currentUser.captchaStats.lastAttemptDate = new Date().toDateString();
+            currentUser.captchaStats.attemptsThisSession++;
             
             // Check if limit reached (8 attempts)
-            if (currentUser.captchaStats.attemptsToday >= CAPTCHA_DAILY_LIMIT) {
+            if (currentUser.captchaStats.attemptsThisSession >= CAPTCHA_SESSION_LIMIT) {
                 currentUser.captchaStats.lockUntil = Date.now() + CAPTCHA_LOCK_DURATION;
                 // Auto redirect to home
                 setTimeout(() => {
@@ -2154,16 +2169,28 @@
             const remaining = currentUser.captchaStats.lockUntil - Date.now();
             
             if (remaining <= 0) {
-                // Lock expired
+                // Lock expired - reset session
+                currentUser.captchaStats.attemptsThisSession = 0;
                 currentUser.captchaStats.lockUntil = null;
-                currentUser.captchaStats.attemptsToday = 0;
                 saveUsers();
                 updateCaptchaLockUI();
+                
+                // Show toast notification
+                showToast('Captcha unlocked! You can play again.', 'success');
                 
                 if (captchaTimerInterval) {
                     clearInterval(captchaTimerInterval);
                 }
                 return;
+            }
+            
+            // Update timer badge
+            const timerBadge = document.getElementById('captcha-timer-badge');
+            if (timerBadge) {
+                const remainingTime = Math.ceil(remaining / 1000 / 60);
+                const hours = Math.floor(remainingTime / 60);
+                const minutes = remainingTime % 60;
+                timerBadge.textContent = `${hours}h ${minutes}m`;
             }
         }
         
@@ -2219,8 +2246,7 @@
                 isNew: true, // For 50 coins gift popup
                 claimedCodes: [],
                 captchaStats: {
-                    attemptsToday: 0,
-                    lastAttemptDate: new Date().toDateString(),
+                    attemptsThisSession: 0,
                     lockUntil: null
                 },
                 history: {
@@ -2632,8 +2658,8 @@
             if (!currentUser) return;
             
             // Check if user can play more captcha
-            if (currentUser.captchaStats.attemptsToday >= CAPTCHA_DAILY_LIMIT) {
-                showToast("Daily limit reached! Please wait for 3 hours.", 'warning');
+            if (currentUser.captchaStats.attemptsThisSession >= CAPTCHA_SESSION_LIMIT) {
+                showToast("Session limit reached! Please wait for 3 hours.", 'warning');
                 closeCaptchaModal();
                 navTo('home', document.querySelector('.nav-item:nth-child(1)'));
                 return;
@@ -2664,7 +2690,7 @@
                 closeCaptchaModal();
                 
                 // Check if limit reached
-                if (currentUser.captchaStats.attemptsToday >= CAPTCHA_DAILY_LIMIT) {
+                if (currentUser.captchaStats.attemptsThisSession >= CAPTCHA_SESSION_LIMIT) {
                     showToast("8 captcha attempts completed! Locked for 3 hours.", 'warning');
                     navTo('home', document.querySelector('.nav-item:nth-child(1)'));
                 }
@@ -2682,8 +2708,8 @@
                 return;
             }
             
-            if (isNaN(amount) || amount < 1200) {
-                alert("Minimum redeem amount is 1200 coins (₹10).");
+            if (isNaN(amount) || amount < 6000) {
+                alert("Minimum redeem amount is 6000 coins (₹50).");
                 return;
             }
             
@@ -2708,7 +2734,7 @@
             saveUsers();
             
             // Show success message
-            alert(`✅ Redeem request for ${amount} Coins successful!\n\nTransaction ID: ${transId}\n1200 Coins = ₹10\n\nAfter completing the withdrawal, contact the agent for payment through contact service.`);
+            alert(`✅ Redeem request for ${amount} Coins successful!\n\nTransaction ID: ${transId}\n6000 Coins = ₹50\n\nAfter completing the withdrawal, contact the agent for payment through contact service.`);
             
             document.getElementById('redeem-amount').value = "";
             document.getElementById('redeem-name').value = "";
