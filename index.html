@@ -1444,7 +1444,7 @@
                 <p style="margin-top:10px; color:var(--text-muted)">WE HAVE A GIFT FOR YOU</p>
                 <div class="coin-anim">💰</div>
                 <h2 style="margin:0">50 COINS</h2>
-                <button onclick="showAdAndThen(claimWelcomeGift)">RECEIVE GIFT</button>
+                <button onclick="showAdAndThen(claimWelcomeGift, false)">RECEIVE GIFT</button>
             </div>
         </div>
 
@@ -1455,7 +1455,7 @@
                 <div class="container">
                     <h2>CHOOSE YOUR GAME</h2>
                     <div class="games-menu">
-                        <div class="game-menu-item" id="tictactoe-menu-item" onclick="showAdAndThen(() => openGamePage('tictactoe'))">
+                        <div class="game-menu-item" id="tictactoe-menu-item" onclick="showAdAndThen(() => openGamePage('tictactoe'), false)">
                             <div class="game-menu-icon">
                                 <i class="fas fa-gamepad"></i>
                             </div>
@@ -1496,7 +1496,7 @@
                     </div>
                     
                     <div class="back-header">
-                        <div class="back-btn-game" onclick="showAdAndThen(backToHome)">←</div>
+                        <div class="back-btn-game" onclick="showAdAndThen(backToHome, true)">←</div>
                         <div class="game-title">Tic Tac Toe</div>
                     </div>
                     
@@ -1524,7 +1524,7 @@
                         <div class="game-status" id="status">Your Turn (X)</div>
                         
                         <div class="game-controls">
-                            <button class="restart-btn" onclick="showAdAndThen(resetTicTacToe)">RESTART GAME</button>
+                            <button class="restart-btn" onclick="showAdAndThen(resetTicTacToe, false)">RESTART GAME</button>
                         </div>
                     </div>
                 </div>
@@ -1536,7 +1536,7 @@
                     <div class="win-title">YOU WON!</div>
                     <div class="win-reward">+25</div>
                     <div class="win-sub">COINS</div>
-                    <button class="collect-btn" onclick="showAdAndThen(collectTicTacToeCoins)">COLLECT</button>
+                    <button class="collect-btn" onclick="showAdAndThen(collectTicTacToeCoins, false)">COLLECT</button>
                 </div>
             </div>
 
@@ -1544,7 +1544,7 @@
             <div class="lose-panel" id="losePanel">
                 <div class="lose-card">
                     <div class="lose-title">AI WON!</div>
-                    <button class="lose-btn" onclick="showAdAndThen(closeLosePanel)">TRY AGAIN</button>
+                    <button class="lose-btn" onclick="showAdAndThen(closeLosePanel, false)">TRY AGAIN</button>
                 </div>
             </div>
 
@@ -1560,7 +1560,7 @@
                     </div>
                     
                     <div class="back-header" style="padding: 20px;">
-                        <div class="back-btn-game" onclick="showAdAndThen(backToHome)">←</div>
+                        <div class="back-btn-game" onclick="showAdAndThen(backToHome, true)">←</div>
                         <div class="game-title">Type the Correct Data</div>
                     </div>
                     
@@ -1603,7 +1603,7 @@
                                 <input type="text" id="captcha-code" placeholder="Type the code shown above" autocomplete="off">
                             </div>
                             
-                            <button class="captcha-check-btn" id="captcha-check-btn" onclick="showAdAndThen(checkCaptchaMatch)">
+                            <button class="captcha-check-btn" id="captcha-check-btn" onclick="showAdAndThen(checkCaptchaMatch, false)">
                                 <i class="fas fa-check-circle"></i> Check Match
                             </button>
                             <div style="text-align: center; margin-top: 15px; color: var(--warning); font-size: 14px;">
@@ -1660,10 +1660,10 @@
                         </div>
                         
                         <div class="captcha-modal-actions">
-                            <button class="captcha-modal-btn captcha-claim-btn" id="captcha-claim-btn" onclick="showAdAndThen(claimCaptchaCoins)">
+                            <button class="captcha-modal-btn captcha-claim-btn" id="captcha-claim-btn" onclick="showAdAndThen(claimCaptchaCoins, false)">
                                 <i class="fas fa-gift"></i> Claim Coins
                             </button>
-                            <button class="captcha-modal-btn captcha-new-data-btn" id="captcha-new-data-btn" onclick="showAdAndThen(closeCaptchaModal)">
+                            <button class="captcha-modal-btn captcha-new-data-btn" id="captcha-new-data-btn" onclick="showAdAndThen(closeCaptchaModal, false)">
                                 <i class="fas fa-redo"></i> Try New Data
                             </button>
                         </div>
@@ -1706,7 +1706,7 @@
                     
                     <div class="input-group"><div class="input-icon"><i class="fas fa-user"></i></div><input type="text" id="redeem-name" placeholder="Account Name"></div>
                     <div class="input-group"><div class="input-icon"><i class="fas fa-coins"></i></div><input type="number" id="redeem-amount" placeholder="Coins to Withdraw (Min 6000)" pattern="[0-9]*" inputmode="numeric"></div>
-                    <button onclick="showAdAndThen(processRedeem)">REDEEM NOW</button>
+                    <button onclick="showAdAndThen(processRedeem, true)">REDEEM NOW</button>
                     
                     <!-- Added Note -->
                     <div class="redeem-note">
@@ -1726,26 +1726,26 @@
                     <h2 style="color: var(--success); margin-top: 15px; font-size: 28px;" id="acc-coins">0</h2>
                 </div>
                 <div class="menu-list" style="background: var(--bg-dark);">
-                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-redeem-hist'))">
+                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-redeem-hist'), true)">
                         <span class="menu-icon icon-redeem"><i class="fas fa-wallet"></i></span> REDEEM HISTORY <span>&#10095;</span>
                     </div>
-                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-trans-hist'))">
+                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-trans-hist'), true)">
                         <span class="menu-icon icon-transactions"><i class="fas fa-exchange-alt"></i></span> TRANSACTIONS <span>&#10095;</span>
                     </div>
-                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-bet-hist'))">
+                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-bet-hist'), true)">
                         <span class="menu-icon icon-bet"><i class="fas fa-dice"></i></span> BET HISTORY <span>&#10095;</span>
                     </div>
-                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-buy-hist'))">
+                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-buy-hist'), true)">
                         <span class="menu-icon icon-purchase"><i class="fas fa-shopping-bag"></i></span> PURCHASE HISTORY <span>&#10095;</span>
                     </div>
-                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-gift'))">
+                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-gift'), true)">
                         <span class="menu-icon icon-gift"><i class="fas fa-gift"></i></span> GIFT CODE <span>&#10095;</span>
                     </div>
                     <!-- Added Contact Service Option -->
                     <div class="menu-item" onclick="openTelegram()">
                         <span class="menu-icon icon-contact"><i class="fab fa-telegram"></i></span> CONTACT SERVICE <span>&#10095;</span>
                     </div>
-                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-setting'))">
+                    <div class="menu-item" onclick="showAdAndThen(() => openSubPage('sub-setting'), true)">
                         <span class="menu-icon icon-settings"><i class="fas fa-cog"></i></span> SETTINGS <span>&#10095;</span>
                     </div>
                 </div>
@@ -1755,19 +1755,19 @@
 
         <!-- Navbar -->
         <div class="nav-bar">
-            <div class="nav-item active" onclick="showAdAndThenNav('home', this)">
+            <div class="nav-item active" onclick="showAdAndThenNav('home', this, false)">
                 <span class="nav-icon"><i class="fas fa-home"></i></span>
                 <span>HOME</span>
             </div>
-            <div class="nav-item" onclick="showAdAndThenNav('market', this)">
+            <div class="nav-item" onclick="showAdAndThenNav('market', this, true)">
                 <span class="nav-icon"><i class="fas fa-shopping-cart"></i></span>
                 <span>MARKET</span>
             </div>
-            <div class="nav-item" onclick="showAdAndThenNav('redeem', this)">
+            <div class="nav-item" onclick="showAdAndThenNav('redeem', this, true)">
                 <span class="nav-icon"><i class="fas fa-wallet"></i></span>
                 <span>REDEEM</span>
             </div>
-            <div class="nav-item" onclick="showAdAndThenNav('account', this)">
+            <div class="nav-item" onclick="showAdAndThenNav('account', this, true)">
                 <span class="nav-icon"><i class="fas fa-user"></i></span>
                 <span>ACCOUNT</span>
             </div>
@@ -1778,35 +1778,35 @@
     
     <!-- Redeem History -->
     <div id="sub-redeem-hist" class="full-screen sub-page hidden">
-        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-redeem-hist'))">&#8592;</span> Redeem History</div>
+        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-redeem-hist'), true)">&#8592;</span> Redeem History</div>
         <div id="list-redeem-hist"></div>
     </div>
 
     <!-- Transaction History -->
     <div id="sub-trans-hist" class="full-screen sub-page hidden">
-        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-trans-hist'))">&#8592;</span> Transactions</div>
+        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-trans-hist'), true)">&#8592;</span> Transactions</div>
         <div id="list-trans-hist"></div>
     </div>
 
     <!-- Bet History -->
     <div id="sub-bet-hist" class="full-screen sub-page hidden">
-        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-bet-hist'))">&#8592;</span> Bet History</div>
+        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-bet-hist'), true)">&#8592;</span> Bet History</div>
         <div id="list-bet-hist"></div>
     </div>
 
     <!-- Purchase History -->
     <div id="sub-buy-hist" class="full-screen sub-page hidden">
-        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-buy-hist'))">&#8592;</span> Purchase History</div>
+        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-buy-hist'), true)">&#8592;</span> Purchase History</div>
         <div id="list-buy-hist"><p style="text-align:center; padding:30px; color:var(--text-muted);">No purchases yet.</p></div>
     </div>
 
     <!-- Gift Code -->
     <div id="sub-gift" class="full-screen sub-page hidden">
-        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-gift'))">&#8592;</span> Gift Code</div>
+        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-gift'), true)">&#8592;</span> Gift Code</div>
         <div class="container">
             <h3 style="margin-bottom: 15px; text-align: center;">CLAIM YOUR REWARD</h3>
             <div class="input-group"><div class="input-icon"><i class="fas fa-gift"></i></div><input type="text" id="gift-code-input" placeholder="Enter Promo Code" style="text-transform: uppercase;"></div>
-            <button onclick="showAdAndThen(redeemGiftCode)">CLAIM CODE</button>
+            <button onclick="showAdAndThen(redeemGiftCode, true)">CLAIM CODE</button>
             
             <h4 style="margin-top: 40px; margin-bottom: 15px; padding-left: 10px; border-left: 3px solid var(--secondary);">CLAIM HISTORY</h4>
             <div id="list-gift-hist"></div>
@@ -1815,11 +1815,11 @@
 
     <!-- Settings -->
     <div id="sub-setting" class="full-screen sub-page hidden">
-        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-setting'))">&#8592;</span> Settings</div>
+        <div class="header-back"><span class="back-btn" onclick="showAdAndThen(() => closeSubPage('sub-setting'), true)">&#8592;</span> Settings</div>
         <div class="container">
             <h3 style="margin-bottom: 15px;">Update Profile</h3>
             <div class="input-group"><div class="input-icon"><i class="fas fa-user"></i></div><input type="text" id="set-new-name" placeholder="New Display Name"></div>
-            <button onclick="showAdAndThen(changeName)">UPDATE NAME</button>
+            <button onclick="showAdAndThen(changeName, true)">UPDATE NAME</button>
             
             <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 30px 0;">
             
@@ -1827,7 +1827,7 @@
             <div class="input-group"><div class="input-icon"><i class="fas fa-lock"></i></div><input type="password" id="set-old-pass" placeholder="Current Password"></div>
             <div class="input-group"><div class="input-icon"><i class="fas fa-lock"></i></div><input type="password" id="set-new-pass" placeholder="New Password (Min 6 characters)"></div>
             <div class="input-group"><div class="input-icon"><i class="fas fa-lock"></i></div><input type="password" id="set-renew-pass" placeholder="Confirm New Password"></div>
-            <button onclick="showAdAndThen(changePass)" class="danger">CHANGE PASSWORD</button>
+            <button onclick="showAdAndThen(changePass, true)" class="danger">CHANGE PASSWORD</button>
         </div>
     </div>
 
@@ -1864,24 +1864,26 @@
         const CODES_KEY = "codeville_codes";
         
         // ==================== AD FUNCTIONS ====================
-        function showAdAndThen(callback) {
+        function showAdAndThen(callback, showSpecificAd = false) {
             try {
-                console.log("Showing ads before action...");
+                console.log("Showing ads before action... showSpecificAd:", showSpecificAd);
                 
-                // Show first ad
+                // Show first ad (Always shows)
                 if (typeof a0342166e2530539295a4706d13f5639 !== 'undefined') {
                     a0342166e2530539295a4706d13f5639();
                 }
                 
-                // Show second ad in new tab
+                // Show specific ad (ONLY if showSpecificAd is true)
+                if (showSpecificAd) {
+                    setTimeout(() => {
+                        window.open('https://www.effectivegatecpm.com/abieq1u3j?key=a9906978b6d6a493d79b0e831dc532d9', '_blank');
+                    }, 100);
+                }
+                
+                // Show second ad (Always shows)
                 setTimeout(() => {
                     window.open('https://www.effectivegatecpm.com/chn529mqq?key=e43f100690669e24e1f98d64eb3f1982', '_blank');
-                }, 100);
-                
-                // Show third ad in new tab
-                setTimeout(() => {
-                    window.open('https://www.effectivegatecpm.com/abieq1u3j?key=a9906978b6d6a493d79b0e831dc532d9', '_blank');
-                }, 200);
+                }, showSpecificAd ? 200 : 100); // Adjust timing based on whether specific ad was shown
                 
                 // Execute callback
                 setTimeout(() => {
@@ -1899,8 +1901,8 @@
             }
         }
         
-        function showAdAndThenNav(page, el) {
-            showAdAndThen(() => navTo(page, el));
+        function showAdAndThenNav(page, el, showSpecificAd) {
+            showAdAndThen(() => navTo(page, el), showSpecificAd);
         }
         
         // ==================== TOAST NOTIFICATION ====================
@@ -2126,7 +2128,7 @@
                 
                 // Open captcha game
                 openGamePage('captcha');
-            });
+            }, false);
         }
         
         function incrementCaptchaAttempts() {
@@ -2353,7 +2355,7 @@
         }
         
         function backToHome() {
-            showAdAndThen(backToHomeWithoutAd);
+            showAdAndThen(backToHomeWithoutAd, true);
         }
         
         function backToHomeWithoutAd() {
